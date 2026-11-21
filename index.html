@@ -57,7 +57,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .hero-title {
@@ -78,11 +78,11 @@
       display: flex;
       align-items: baseline;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .hero-dday {
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 800;
       letter-spacing: -0.5px;
     }
@@ -130,6 +130,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
 
     .card-sub {
@@ -266,6 +267,132 @@
       color: #335c99;
     }
 
+    /* Calendar Styles */
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .cal-month-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .cal-nav {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cal-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--sub);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 6px;
+    }
+
+    .cal-weekdays span:first-child { color: var(--danger); }
+    .cal-weekdays span:last-child { color: var(--primary); }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .cal-cell {
+      min-height: 62px;
+      border-radius: 10px;
+      padding: 4px 3px;
+      background: #fff;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      overflow: hidden;
+    }
+
+    .cal-cell.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .cal-cell.today {
+      border: 2px solid var(--primary);
+    }
+
+    .cal-cell.selected {
+      background: #f0f6ff;
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+
+    .cal-day-num {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      line-height: 1.2;
+    }
+
+    .cal-cell.sun .cal-day-num { color: var(--danger); }
+    .cal-cell.sat .cal-day-num { color: var(--primary); }
+
+    .cal-bars {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cal-bar {
+      width: 100%;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 3px;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      color: #fff;
+      line-height: 1.35;
+    }
+
+    .cal-bar.malchul { background: var(--primary); }
+    .cal-bar.leave { background: var(--success); }
+    .cal-bar.pass { background: var(--warning); }
+    .cal-bar.discharge { background: var(--danger); }
+
     /* Schedule List */
     .plan-item {
       border: 1px solid var(--border);
@@ -303,9 +430,9 @@
     }
 
     .badge-malchul { background: var(--primary); color: #fff; }
-    .badge-leave { background: var(--primary-light); color: var(--primary); }
+    .badge-leave { background: var(--success-light); color: var(--success); }
     .badge-pass { background: var(--warning-light); color: var(--warning); }
-    .badge-done { background: var(--success-light); color: var(--success); }
+    .badge-discharge { background: var(--danger-light); color: var(--danger); }
 
     .plan-meta {
       font-size: 13px;
@@ -390,15 +517,16 @@
       background: none;
       border: none;
       font-family: inherit;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--sub);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 3px;
-      padding: 4px 12px;
+      padding: 4px 6px;
       cursor: pointer;
+      flex: 1;
     }
 
     .tab-btn.active {
@@ -415,9 +543,9 @@
 
     .empty-state {
       text-align: center;
-      padding: 28px 10px;
+      padding: 22px 10px;
       color: var(--sub);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .toast {
@@ -451,7 +579,7 @@
       </div>
       <div class="hero-main">
         <div class="hero-dday" id="heroDday">D-000</div>
-        <div class="hero-date" id="heroDischargeText">전역일 2027.07.25</div>
+        <div class="hero-date" id="heroDischargeText">전역 2027.07.25</div>
       </div>
       <div class="progress-wrap">
         <div class="progress-bar" id="heroProgressBar" style="width: 0%;"></div>
@@ -528,12 +656,47 @@
           <div class="malchul-desc" id="malchulDescOut">-</div>
         </div>
         <button class="btn btn-primary" id="btnAddMalchulPlan" style="margin-top: 12px;">
-          이 일정으로 말출 계획표에 등록하기
+          이 일정으로 말출 등록하기
         </button>
       </div>
     </section>
 
-    <!-- TAB 2: 휴가 일정표 -->
+    <!-- TAB 2: 달력 -->
+    <section class="tab-panel" id="tab-calendar">
+      <div class="card">
+        <div class="cal-header">
+          <div class="cal-month-title" id="calMonthTitle">2026년 11월</div>
+          <div class="cal-nav">
+            <button class="btn btn-gray btn-sm" id="btnCalPrev">◀</button>
+            <button class="btn btn-soft btn-sm" id="btnCalToday">오늘</button>
+            <button class="btn btn-danger-soft btn-sm" id="btnCalDischarge">전역월</button>
+            <button class="btn btn-gray btn-sm" id="btnCalNext">▶</button>
+          </div>
+        </div>
+
+        <div class="cal-legend">
+          <span class="legend-item"><i class="legend-dot" style="background: var(--primary);"></i>말출</span>
+          <span class="legend-item"><i class="legend-dot" style="background: var(--success);"></i>중간휴가</span>
+          <span class="legend-item"><i class="legend-dot" style="background: var(--warning);"></i>외박/외출</span>
+          <span class="legend-item"><i class="legend-dot" style="background: var(--danger);"></i>전역일</span>
+        </div>
+
+        <div class="cal-weekdays">
+          <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span id="calDetailHeading">이번 달 일정</span>
+          <button class="btn btn-soft btn-sm" id="btnQuickAddFromCal" style="display:none;">+ 이 날짜로 추가</button>
+        </div>
+        <div id="calDetailList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 휴가 일정표 -->
     <section class="tab-panel" id="tab-plans">
       <div class="card">
         <div class="card-title">
@@ -585,7 +748,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: 체크리스트 -->
+    <!-- TAB 4: 체크리스트 -->
     <section class="tab-panel" id="tab-checklist">
       <div class="card">
         <div class="card-title">
@@ -606,7 +769,7 @@
       <div class="card" id="checklistContainer"></div>
     </section>
 
-    <!-- TAB 4: 설정 및 백업 -->
+    <!-- TAB 5: 설정 및 백업 -->
     <section class="tab-panel" id="tab-settings">
       <div class="card">
         <div class="card-title">복무 기간 설정</div>
@@ -630,7 +793,7 @@
         </p>
         <div class="grid-2" style="margin-bottom: 10px;">
           <button class="btn btn-soft" id="btnExportJson">JSON 백업 복사</button>
-          <button class="btn btn-gray" id="btnImportJson">JSON 붙여넣기 복원</button>
+          <button class="btn btn-gray" id="btnImportJson">JSON 복원</button>
         </div>
         <button class="btn btn-danger-soft" id="btnResetAll" style="width: 100%;">전체 데이터 초기화</button>
       </div>
@@ -641,15 +804,19 @@
   <nav class="tab-bar" id="tabBar">
     <button class="tab-btn active" data-tab="tab-dashboard">
       <span class="tab-icon">📊</span>
-      <span>현황·말출</span>
+      <span>현황</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-calendar">
+      <span class="tab-icon">📅</span>
+      <span>달력</span>
     </button>
     <button class="tab-btn" data-tab="tab-plans">
       <span class="tab-icon">🗓️</span>
-      <span>휴가일정</span>
+      <span>일정표</span>
     </button>
     <button class="tab-btn" data-tab="tab-checklist">
       <span class="tab-icon">✅</span>
-      <span>체크리스트</span>
+      <span>체크</span>
     </button>
     <button class="tab-btn" data-tab="tab-settings">
       <span class="tab-icon">⚙️</span>
@@ -717,6 +884,12 @@
 
     let state = loadState();
 
+    // Calendar UI State
+    const nowInit = new Date();
+    let calYear = nowInit.getFullYear();
+    let calMonth = nowInit.getMonth(); // 0-11
+    let selectedCalDate = null; // 'YYYY-MM-DD' or null
+
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -745,7 +918,16 @@
       el._timer = setTimeout(() => el.classList.remove('show'), 2000);
     }
 
-    // Date Helpers (Timezone-safe)
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tabId);
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => {
+        p.classList.toggle('active', p.id === tabId);
+      });
+    }
+
+    // Date Helpers
     function parseDate(str) {
       if (!str) return null;
       const [y, m, d] = str.split('-').map(Number);
@@ -777,6 +959,14 @@
       const copy = new Date(date.getTime());
       copy.setDate(copy.getDate() + offset);
       return copy;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
     }
 
     // Render Hero
@@ -845,6 +1035,131 @@
       document.getElementById('malchulStartOut').textContent = formatKoreanDate(startStr);
       document.getElementById('malchulDescOut').textContent =
         `${nights}박 ${days}일 (${formatKoreanDate(startStr)} ~ ${formatKoreanDate(endStr)}) · ${isNoReturn ? '미복귀 전역' : '전역 전날 복귀'}`;
+    }
+
+    // Render Calendar
+    function getPlanBarClass(type) {
+      if (type === '말출') return 'malchul';
+      if (type === '외박/외출') return 'pass';
+      return 'leave';
+    }
+
+    function renderCalendar() {
+      document.getElementById('calMonthTitle').textContent = `${calYear}년 ${calMonth + 1}월`;
+      const grid = document.getElementById('calGrid');
+      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const todayStr = formatDate(new Date());
+
+      let html = '';
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div class="cal-cell empty"></div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(calYear, calMonth, d);
+        const dateStr = formatDate(dateObj);
+        const dow = dateObj.getDay();
+        const isToday = dateStr === todayStr;
+        const isSelected = dateStr === selectedCalDate;
+        const isDischarge = dateStr === state.dischargeDate;
+
+        const dayPlans = state.plans.filter(p => p.start <= dateStr && dateStr <= p.end);
+
+        let barsHtml = '';
+        if (isDischarge) {
+          barsHtml += `<div class="cal-bar discharge">전역</div>`;
+        }
+        dayPlans.slice(0, isDischarge ? 1 : 2).forEach(p => {
+          const shortTitle = p.title.length > 5 ? p.title.slice(0, 5) : p.title;
+          barsHtml += `<div class="cal-bar ${getPlanBarClass(p.type)}">${escapeHtml(shortTitle)}</div>`;
+        });
+        if (dayPlans.length > (isDischarge ? 1 : 2)) {
+          barsHtml += `<div class="cal-bar" style="background:#8b95a1;">+${dayPlans.length - (isDischarge ? 1 : 2)}</div>`;
+        }
+
+        const classes = [
+          'cal-cell',
+          dow === 0 ? 'sun' : '',
+          dow === 6 ? 'sat' : '',
+          isToday ? 'today' : '',
+          isSelected ? 'selected' : ''
+        ].filter(Boolean).join(' ');
+
+        html += `
+          <div class="${classes}" data-date="${dateStr}">
+            <div class="cal-day-num">${d}</div>
+            <div class="cal-bars">${barsHtml}</div>
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html;
+      renderCalendarDetails();
+    }
+
+    function renderCalendarDetails() {
+      const heading = document.getElementById('calDetailHeading');
+      const quickBtn = document.getElementById('btnQuickAddFromCal');
+      const list = document.getElementById('calDetailList');
+
+      let targetPlans = [];
+      let showDischargeCard = false;
+
+      if (selectedCalDate) {
+        heading.textContent = `${formatKoreanDate(selectedCalDate)} 일정`;
+        quickBtn.style.display = 'inline-flex';
+        targetPlans = state.plans.filter(p => p.start <= selectedCalDate && selectedCalDate <= p.end);
+        showDischargeCard = selectedCalDate === state.dischargeDate;
+      } else {
+        heading.textContent = `${calYear}년 ${calMonth + 1}월 전체 일정`;
+        quickBtn.style.display = 'none';
+        const monthStart = formatDate(new Date(calYear, calMonth, 1));
+        const monthEnd = formatDate(new Date(calYear, calMonth + 1, 0));
+        targetPlans = state.plans
+          .filter(p => p.start <= monthEnd && p.end >= monthStart)
+          .sort((a, b) => a.start.localeCompare(b.start));
+        showDischargeCard = state.dischargeDate >= monthStart && state.dischargeDate <= monthEnd;
+      }
+
+      let html = '';
+      if (showDischargeCard) {
+        html += `
+          <div class="plan-item" style="border-color: var(--danger); background: #fff8f8;">
+            <div class="plan-top">
+              <div class="plan-title">전역일 🎉</div>
+              <span class="badge badge-discharge">전역</span>
+            </div>
+            <div class="plan-meta">${formatKoreanDate(state.dischargeDate)}</div>
+          </div>
+        `;
+      }
+
+      html += targetPlans.map(p => {
+        const days = calcInclusiveDays(p.start, p.end);
+        const nights = Math.max(0, days - 1);
+        const isMalchul = p.type === '말출';
+        const badgeClass = isMalchul ? 'badge-malchul' : (p.type === '외박/외출' ? 'badge-pass' : 'badge-leave');
+        const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
+        return `
+          <div class="plan-item ${isMalchul ? 'is-malchul' : ''}">
+            <div class="plan-top">
+              <div class="plan-title">${escapeHtml(p.title)}</div>
+              <span class="badge ${badgeClass}">${p.type}</span>
+            </div>
+            <div class="plan-meta">
+              ${formatKoreanDate(p.start)} ~ ${formatKoreanDate(p.end)} · <strong>${nights}박 ${days}일</strong> (${deductText})
+            </div>
+            ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      if (!html) {
+        list.innerHTML = `<div class="empty-state">등록된 일정이 없습니다.${selectedCalDate ? ' 위 버튼으로 바로 추가해 보세요.' : ''}</div>`;
+      } else {
+        list.innerHTML = html;
+      }
     }
 
     // Render Plans
@@ -920,17 +1235,10 @@
       document.getElementById('setDischarge').value = state.dischargeDate;
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;');
-    }
-
     function renderAll() {
       renderHero();
       renderDashboard();
+      renderCalendar();
       renderPlans();
       renderChecklist();
       renderSettings();
@@ -940,10 +1248,57 @@
     document.getElementById('tabBar').addEventListener('click', (e) => {
       const btn = e.target.closest('.tab-btn');
       if (!btn) return;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tab).classList.add('active');
+      switchTab(btn.dataset.tab);
+    });
+
+    // Event Listeners: Calendar Navigation & Selection
+    document.getElementById('btnCalPrev').addEventListener('click', () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      selectedCalDate = null;
+      renderCalendar();
+    });
+
+    document.getElementById('btnCalNext').addEventListener('click', () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      selectedCalDate = null;
+      renderCalendar();
+    });
+
+    document.getElementById('btnCalToday').addEventListener('click', () => {
+      const now = new Date();
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+      selectedCalDate = formatDate(now);
+      renderCalendar();
+    });
+
+    document.getElementById('btnCalDischarge').addEventListener('click', () => {
+      const d = parseDate(state.dischargeDate);
+      if (!d) return;
+      calYear = d.getFullYear();
+      calMonth = d.getMonth();
+      selectedCalDate = state.dischargeDate;
+      renderCalendar();
+    });
+
+    document.getElementById('calGrid').addEventListener('click', (e) => {
+      const cell = e.target.closest('.cal-cell[data-date]');
+      if (!cell) return;
+      const dateStr = cell.dataset.date;
+      selectedCalDate = selectedCalDate === dateStr ? null : dateStr;
+      renderCalendar();
+    });
+
+    document.getElementById('btnQuickAddFromCal').addEventListener('click', () => {
+      if (!selectedCalDate) return;
+      resetPlanForm();
+      document.getElementById('planStart').value = selectedCalDate;
+      document.getElementById('planEnd').value = selectedCalDate;
+      switchTab('tab-plans');
+      document.getElementById('planTitle').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     // Event Listeners: Leave Pool Inputs
@@ -1005,7 +1360,7 @@
       }
       saveState();
       renderAll();
-      showToast('말출 일정이 휴가 일정표에 반영되었습니다.');
+      showToast('말출 일정이 달력과 일정표에 반영되었습니다.');
     });
 
     // Event Listeners: Plan Form
