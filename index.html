@@ -1,1373 +1,1179 @@
 <!DOCTYPE html>
-<html lang="ko" class="dark">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PX 카드마스터 Pro</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        army: {
-                            900: '#0f172a',
-                            800: '#1e293b',
-                            700: '#334155',
-                            accent: '#10b981',
-                            gold: '#f59e0b',
-                            khaki: '#4d5b44'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome for Military / Store Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
-        body {
-            font-family: 'Pretendard', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        /* Custom Scrollbar for Catalog & History */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>전역 & 휴가 플래너</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #191f28;
+      --sub: #6b7684;
+      --border: #e5e8eb;
+      --primary: #3182f6;
+      --primary-light: #e8f3ff;
+      --danger: #f04452;
+      --danger-light: #ffeeee;
+      --success: #00b87c;
+      --success-light: #e6f8f2;
+      --warning: #ff9800;
+      --warning-light: #fff4e5;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 84px;
+    }
+
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Header & D-Day Banner */
+    .hero {
+      background: linear-gradient(135deg, #1b64da, #3182f6);
+      color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 20px rgba(49, 130, 246, 0.22);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 14px;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+
+    .dday-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero-main {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hero-dday {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-date {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .progress-wrap {
+      background: rgba(255, 255, 255, 0.22);
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar {
+      background: #fff;
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--sub);
+      font-weight: 500;
+    }
+
+    /* Summary Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      padding: 12px 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 4px;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .stat-val.primary { color: var(--primary); }
+    .stat-val.success { color: var(--success); }
+    .stat-val.danger { color: var(--danger); }
+
+    /* Form Controls */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sub);
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+      margin: 8px 0 12px;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      font-family: inherit;
+    }
+
+    .btn:active { opacity: 0.75; }
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+    .btn-soft { background: var(--primary-light); color: var(--primary); }
+    .btn-danger-soft { background: var(--danger-light); color: var(--danger); }
+    .btn-gray { background: var(--bg); color: var(--text); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+    /* Malchul Box */
+    .malchul-result {
+      background: var(--primary-light);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .malchul-date {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 4px 0;
+    }
+
+    .malchul-desc {
+      font-size: 12px;
+      color: #335c99;
+    }
+
+    /* Schedule List */
+    .plan-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    .plan-item.is-malchul {
+      border-color: var(--primary);
+      background: #f8fbff;
+    }
+
+    .plan-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .plan-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-malchul { background: var(--primary); color: #fff; }
+    .badge-leave { background: var(--primary-light); color: var(--primary); }
+    .badge-pass { background: var(--warning-light); color: var(--warning); }
+    .badge-done { background: var(--success-light); color: var(--success); }
+
+    .plan-meta {
+      font-size: 13px;
+      color: var(--sub);
+      margin-bottom: 6px;
+    }
+
+    .plan-memo {
+      font-size: 13px;
+      background: var(--bg);
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      color: #4e5968;
+      white-space: pre-wrap;
+    }
+
+    .plan-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    /* Checklist */
+    .check-group-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 14px 0 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .check-item:last-child { border-bottom: none; }
+
+    .check-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .check-left input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .check-text {
+      font-size: 14px;
+    }
+
+    .check-text.done {
+      text-decoration: line-through;
+      color: var(--sub);
+    }
+
+    /* Bottom Tabs */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sub);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 4px 12px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .tab-icon {
+      font-size: 18px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 10px;
+      color: var(--sub);
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(25, 31, 40, 0.9);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    .toast.show { opacity: 1; }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12 antialiased selection:bg-emerald-500 selection:text-white">
-
-    <!-- Top App Header -->
-    <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <div class="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/30">
-                    <i class="fa-solid fa-[#fa-shield-halved] fa-shield-halved text-xl"></i>
-                </div>
-                <div>
-                    <div class="flex items-center space-x-1.5">
-                        <h1 class="font-extrabold text-base tracking-tight text-white">PX 카드마스터</h1>
-                        <span class="bg-amber-500 text-slate-950 text-[10px] font-black px-1.5 py-0.5 rounded">PRO</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400">3기 나라사랑카드 PX 실전 결제 엔진</p>
-                </div>
-            </div>
-
-            <!-- Global Action Controls -->
-            <div class="flex items-center space-x-2">
-                <!-- Settings Modal Trigger -->
-                <button onclick="openSettingsModal()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-1 border border-slate-700">
-                    <i class="fa-solid fa-sliders text-xs text-amber-400"></i>
-                    <span>설정</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Mobile Container -->
-    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
-
-        <!-- Top Toggles Control Bar (Payday & Split Payment ON/OFF) -->
-        <div class="grid grid-cols-2 gap-2">
-            <!-- Payday Toggle -->
-            <button id="paydayToggleBtn" onclick="togglePaydayMode()" class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 transition-all text-xs">
-                <span class="flex items-center space-x-1.5 text-slate-300 font-medium">
-                    <i class="fa-regular fa-calendar-check text-amber-400"></i>
-                    <span>급여일(10일)</span>
-                </span>
-                <span id="paydayStatusBadge" class="font-bold px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-400">OFF</span>
-            </button>
-
-            <!-- Split Payment Toggle (Key Feature requested) -->
-            <button id="splitPaymentToggleBtn" onclick="toggleSplitPaymentMode()" class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 border border-emerald-500/40 transition-all text-xs shadow-sm shadow-emerald-500/10">
-                <span class="flex items-center space-x-1.5 text-slate-200 font-semibold">
-                    <i class="fa-solid fa-code-fork text-emerald-400"></i>
-                    <span>분할 결제</span>
-                </span>
-                <span id="splitPaymentStatusBadge" class="font-extrabold px-2 py-0.5 rounded-full text-[11px] bg-emerald-500 text-slate-950">ON</span>
-            </button>
-        </div>
-
-        <!-- Main Cashback Summary Banner -->
-        <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4 shadow-xl relative overflow-hidden">
-            <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
-
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="recommendationModeLabel">최대 환급 최적 결제 추천</span>
-                </span>
-                <span id="totalCashbackBadge" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold px-2.5 py-1 rounded-full">
-                    최대 환급 0원
-                </span>
-            </div>
-
-            <!-- Cart Total Amount Display -->
-            <div class="flex items-baseline justify-between my-3">
-                <span class="text-xs text-slate-400 font-medium">장바구니 총액</span>
-                <div class="text-right">
-                    <span id="cartTotalText" class="text-3xl font-black text-white tracking-tight">0</span>
-                    <span class="text-lg font-bold text-slate-300 ml-0.5">원</span>
-                </div>
-            </div>
-
-            <!-- Limit Maximizer Trigger Button -->
-            <button onclick="openLimitMaximizerModal()" class="w-full py-2 bg-gradient-to-r from-amber-600/30 to-amber-500/20 hover:from-amber-600/40 hover:to-amber-500/30 border border-amber-500/40 text-amber-300 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
-                <i class="fa-solid fa-bullseye text-amber-400"></i>
-                <span>한도 털어먹기 (영끌 계산)</span>
-            </button>
-        </div>
-
-        <!-- Payment Recommendation Plan Panel -->
-        <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4 shadow-lg space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <div class="flex items-center space-x-1.5">
-                    <i class="fa-solid fa-[#fa-wand-magic-sparkles] fa-wand-magic-sparkles text-amber-400 text-sm"></i>
-                    <h2 class="text-sm font-bold text-slate-200">추천 결제 플랜</h2>
-                </div>
-                <span id="planModeBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    분할 결제 강추
-                </span>
-            </div>
-
-            <!-- Dynamic Steps List -->
-            <div id="paymentPlanList" class="space-y-2">
-                <!-- Dynamic payment plan rows inserted via JS -->
-            </div>
-
-            <!-- Receipt 2-Split Guide Modal Trigger (Only visible when Split Payment is ON) -->
-            <button id="splitGuideBtn" onclick="openSplitGuideModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition">
-                <i class="fa-solid fa-[#fa-receipt] fa-receipt text-amber-400"></i>
-                <span>바구니 물품 자동 쪼개기 (영수증 2개 분리 가이드)</span>
-            </button>
-
-            <!-- Complete Payment Action Button -->
-            <button onclick="executePaymentCompletion()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold rounded-xl text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center space-x-2 transition">
-                <i class="fa-solid fa-[#fa-check-double] fa-check-double"></i>
-                <span>이대로 결제 완료 (한도 차감 및 영수증 저장)</span>
-            </button>
-        </div>
-
-        <!-- Tier-Jump Tip Banner -->
-        <div id="tierJumpBanner" class="hidden rounded-xl bg-amber-950/40 border border-amber-500/40 p-3 flex items-start space-x-3 text-amber-200 text-xs">
-            <i class="fa-solid fa-[#fa-lightbulb] fa-lightbulb text-amber-400 text-sm mt-0.5 flex-shrink-0"></i>
-            <div class="flex-1" id="tierJumpBannerText">
-                팁: N원만 더 담으면 추가 할인 혜택 구간에 진입합니다!
-            </div>
-        </div>
-
-        <!-- Favorites Quick Bar -->
-        <div class="space-y-2">
-            <div class="flex items-center justify-between text-xs px-1">
-                <span class="font-bold text-slate-300 flex items-center gap-1">
-                    <i class="fa-solid fa-star text-amber-400"></i>
-                    <span>즐겨찾기 퀵 담기</span>
-                </span>
-                <span class="text-[11px] text-slate-500">클릭 시 +1 추가</span>
-            </div>
-            <div id="quickFavoritesBar" class="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
-                <!-- Favorites pills generated via JS -->
-            </div>
-        </div>
-
-        <!-- Cart Items List Container -->
-        <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-[#fa-cart-shopping] fa-cart-shopping text-emerald-400"></i>
-                    <h3 class="font-bold text-sm text-slate-200">담은 PX 물품 목록</h3>
-                    <span id="cartCountBadge" class="bg-slate-800 text-slate-300 text-[11px] font-extrabold px-2 py-0.5 rounded-full">0개</span>
-                </div>
-                <button onclick="clearCart()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">
-                    <i class="fa-solid fa-trash-can mr-1"></i>비우기
-                </button>
-            </div>
-
-            <!-- Cart Items Scroll Area -->
-            <div id="cartItemsContainer" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                <!-- Cart items rendered via JS -->
-            </div>
-
-            <!-- Open Full Catalog Button -->
-            <button onclick="openCatalogModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-750 text-emerald-400 border border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition">
-                <i class="fa-solid fa-[#fa-store] fa-store"></i>
-                <span>전체 품목 카탈로그 (28종+ 검색 & 추가)</span>
-            </button>
-        </div>
-
-        <!-- Card Remaining Limits Status Card -->
-        <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-credit-card text-emerald-400"></i>
-                    <h3 class="font-bold text-sm text-slate-200">3기 나라사랑카드 잔여 혜택 현황</h3>
-                </div>
-                <button onclick="openHistoryModal()" class="text-xs text-amber-400 font-semibold hover:underline">
-                    이력/백업
-                </button>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                <!-- IBK -->
-                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                    <div class="text-[11px] font-bold text-blue-400">IBK 기업</div>
-                    <div id="statusIBKLimit" class="text-xs font-extrabold text-slate-200 mt-1">50,000원</div>
-                    <div id="statusIBKCount" class="text-[10px] text-slate-400 mt-0.5">3만원↑ 2회남음</div>
-                </div>
-                <!-- Shinhan -->
-                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                    <div class="text-[11px] font-bold text-blue-300">신한 카드</div>
-                    <div id="statusShinhanLimit" class="text-xs font-extrabold text-slate-200 mt-1">100,000원</div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">3만원↑ 20%</div>
-                </div>
-                <!-- Hana -->
-                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                    <div class="text-[11px] font-bold text-emerald-300">하나 카드</div>
-                    <div id="statusHanaLimit" class="text-xs font-extrabold text-slate-200 mt-1">100,000원</div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">3만원↓ 30%</div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- ==================== MODALS SECTION ==================== -->
-
-    <!-- 1. Settings & Card Limits Modal -->
-    <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-extrabold text-base text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-amber-400"></i>
-                    <span>카드 보유 & 한도 설정</span>
-                </h3>
-                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Card Selection & Custom Limits -->
-            <div class="space-y-4 text-xs">
-                <!-- IBK Card Settings -->
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center space-x-2 font-bold text-blue-400 cursor-pointer">
-                            <input type="checkbox" id="ownIBK" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0" checked onchange="saveUserSettings()">
-                            <span>IBK 기업 나라사랑카드</span>
-                        </label>
-                        <label class="flex items-center space-x-1 text-[11px] text-amber-300 cursor-pointer bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
-                            <input type="checkbox" id="ibkSalaryTransfer" class="rounded bg-slate-800 border-slate-700 text-amber-500" checked onchange="saveUserSettings()">
-                            <span>병 급여이체(혜택↑)</span>
-                        </label>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 pt-1">
-                        <div>
-                            <span class="text-[11px] text-slate-400">3만원↑ 잔여한도 (최대 5만)</span>
-                            <input type="number" id="ibkOver30kLimit" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-bold mt-1" value="50000" onchange="saveUserSettings()">
-                        </div>
-                        <div>
-                            <span class="text-[11px] text-slate-400">3만원↑ 남은 횟수 (최대 2회)</span>
-                            <input type="number" id="ibkOver30kCount" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-bold mt-1" value="2" min="0" max="2" onchange="saveUserSettings()">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shinhan Card Settings -->
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center space-x-2 font-bold text-blue-300 cursor-pointer">
-                            <input type="checkbox" id="ownShinhan" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0" checked onchange="saveUserSettings()">
-                            <span>신한 나라사랑카드</span>
-                        </label>
-                    </div>
-                    <div>
-                        <span class="text-[11px] text-slate-400">월 통합 잔여 한도 (최대 10만)</span>
-                        <input type="number" id="shinhanLimit" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-bold mt-1" value="100000" onchange="saveUserSettings()">
-                    </div>
-                </div>
-
-                <!-- Hana Card Settings -->
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center space-x-2 font-bold text-emerald-300 cursor-pointer">
-                            <input type="checkbox" id="ownHana" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0" checked onchange="saveUserSettings()">
-                            <span>하나 나라사랑카드</span>
-                        </label>
-                    </div>
-                    <div>
-                        <span class="text-[11px] text-slate-400">월 통합 잔여 한도 (최대 10만)</span>
-                        <input type="number" id="hanaLimit" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-bold mt-1" value="100000" onchange="saveUserSettings()">
-                    </div>
-                </div>
-            </div>
-
-            <div class="pt-2">
-                <button onclick="closeSettingsModal()" class="w-full py-2.5 bg-emerald-600 font-bold text-white rounded-xl text-xs">
-                    저장 및 닫기
-                </button>
-            </div>
-        </div>
+<body>
+  <div class="container">
+    <!-- Hero D-Day -->
+    <div class="hero">
+      <div class="hero-top">
+        <span class="hero-title">전역 & 말출 플래너</span>
+        <span class="dday-badge" id="heroPercent">0.0%</span>
+      </div>
+      <div class="hero-main">
+        <div class="hero-dday" id="heroDday">D-000</div>
+        <div class="hero-date" id="heroDischargeText">전역일 2027.07.25</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="heroProgressBar" style="width: 0%;"></div>
+      </div>
+      <div class="progress-meta">
+        <span id="heroEnlistText">입대 2026.01.26</span>
+        <span id="heroServedText">복무 0일 / 전체 0일</span>
+      </div>
     </div>
 
-    <!-- 2. PX Catalog Modal (28+ Items, Search, Custom Add) -->
-    <div id="catalogModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-4 space-y-3 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <h3 class="font-extrabold text-base text-white flex items-center gap-2">
-                    <i class="fa-solid fa-[#fa-store] fa-store text-emerald-400"></i>
-                    <span>PX 전체 품목 카탈로그</span>
-                </h3>
-                <button onclick="closeCatalogModal()" class="text-slate-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Search Bar & Add Custom Trigger -->
-            <div class="flex space-x-2">
-                <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-                    <input type="text" id="catalogSearchInput" oninput="renderCatalogItems()" placeholder="품목명 검색 (예: 만두, 수분크림)" class="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-                </div>
-                <button onclick="toggleCustomItemForm()" class="px-3 py-1.5 bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-bold whitespace-nowrap">
-                    + 직접 추가
-                </button>
-            </div>
-
-            <!-- Custom Item Form (Collapsible) -->
-            <div id="customItemForm" class="hidden p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2 text-xs">
-                <div class="font-bold text-amber-300">신규 품목 직접 등록</div>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="customName" placeholder="품목명" class="bg-slate-900 border border-slate-700 px-2 py-1 rounded text-white">
-                    <input type="number" id="customPrice" placeholder="가격(원)" class="bg-slate-900 border border-slate-700 px-2 py-1 rounded text-white">
-                </div>
-                <div class="flex items-center justify-between pt-1">
-                    <select id="customCategory" class="bg-slate-900 border border-slate-700 px-2 py-1 rounded text-white">
-                        <option value="식품/냉동">식품/냉동</option>
-                        <option value="간식/음료">간식/음료</option>
-                        <option value="뷰티/생필품">뷰티/생필품</option>
-                    </select>
-                    <button onclick="addCustomCatalogItem()" class="px-3 py-1 bg-emerald-600 font-bold text-white rounded">등록</button>
-                </div>
-            </div>
-
-            <!-- Category Tabs -->
-            <div class="flex space-x-1 bg-slate-950 p-1 rounded-xl text-[11px] overflow-x-auto no-scrollbar">
-                <button onclick="setCategoryFilter('all')" class="cat-tab-btn active font-bold px-2.5 py-1 rounded-lg bg-emerald-600 text-white">전체</button>
-                <button onclick="setCategoryFilter('식품/냉동')" class="cat-tab-btn font-bold px-2.5 py-1 rounded-lg text-slate-400 hover:text-white">식품/냉동</button>
-                <button onclick="setCategoryFilter('간식/음료')" class="cat-tab-btn font-bold px-2.5 py-1 rounded-lg text-slate-400 hover:text-white">간식/음료</button>
-                <button onclick="setCategoryFilter('뷰티/생필품')" class="cat-tab-btn font-bold px-2.5 py-1 rounded-lg text-slate-400 hover:text-white">뷰티/생필품</button>
-            </div>
-
-            <!-- Catalog Items Scroll Area -->
-            <div id="catalogItemsList" class="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[250px]">
-                <!-- Catalog items inserted via JS -->
-            </div>
+    <!-- TAB 1: 대시보드 -->
+    <section class="tab-panel active" id="tab-dashboard">
+      <div class="card">
+        <div class="card-title">
+          <span>휴가 현황 요약</span>
+          <span class="card-sub">차감 일정 기준</span>
         </div>
-    </div>
-
-    <!-- 3. Receipt 2-Split Guide Modal -->
-    <div id="splitGuideModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-extrabold text-base text-white flex items-center gap-2">
-                    <i class="fa-solid fa-[#fa-receipt] fa-receipt text-amber-400"></i>
-                    <span>영수증 2개 분리 계산 가이드</span>
-                </h3>
-                <button onclick="closeSplitGuideModal()" class="text-slate-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <p class="text-xs text-slate-400 leading-relaxed">
-                계산대에서 아래 안내대로 <strong class="text-emerald-400">물품을 나누어 2번 계산</strong>하시면 최대 할인 혜택을 100% 받으실 수 있습니다.
-            </p>
-
-            <div id="splitGuideContent" class="space-y-3 text-xs">
-                <!-- Receipt 1 & Receipt 2 split recommendations generated by JS -->
-            </div>
-
-            <button onclick="closeSplitGuideModal()" class="w-full py-2.5 bg-slate-800 font-bold text-slate-200 rounded-xl text-xs">
-                확인 및 닫기
-            </button>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">총 가용 휴가</div>
+            <div class="stat-val primary" id="statTotal">0일</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">계획/사용</div>
+            <div class="stat-val" id="statUsed">0일</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">잔여 휴가</div>
+            <div class="stat-val success" id="statRemain">0일</div>
+          </div>
         </div>
-    </div>
 
-    <!-- 4. Limit Maximizer ("한도 털어먹기") Modal -->
-    <div id="limitMaximizerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-extrabold text-base text-white flex items-center gap-2">
-                    <i class="fa-solid fa-bullseye text-amber-400"></i>
-                    <span>한도 털어먹기 (영끌 계산기)</span>
-                </h3>
-                <button onclick="closeLimitMaximizerModal()" class="text-slate-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div id="limitMaximizerContent" class="space-y-3 text-xs">
-                <!-- Limit calculation analysis JS output -->
-            </div>
-
-            <button onclick="closeLimitMaximizerModal()" class="w-full py-2.5 bg-slate-800 font-bold text-slate-200 rounded-xl text-xs">
-                닫기
-            </button>
+        <div class="grid-2">
+          <div class="field">
+            <label for="inAnnual">연가 (일)</label>
+            <input type="number" id="inAnnual" min="0" value="0" />
+          </div>
+          <div class="field">
+            <label for="inReward">포상휴가 (일)</label>
+            <input type="number" id="inReward" min="0" value="0" />
+          </div>
+          <div class="field">
+            <label for="inOther">위로·보상휴가 (일)</label>
+            <input type="number" id="inOther" min="0" value="0" />
+          </div>
+          <div class="field">
+            <label for="inExpected">추가 예정 휴가 (일)</label>
+            <input type="number" id="inExpected" min="0" value="0" />
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- 5. History & Backup / Restore Modal -->
-    <div id="historyModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-extrabold text-base text-white flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
-                    <span>결제 이력 및 백업</span>
-                </h3>
-                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- History List -->
-            <div class="space-y-2">
-                <h4 class="font-bold text-xs text-slate-300">최근 결제 영수증 내역</h4>
-                <div id="paymentHistoryList" class="space-y-2 max-h-48 overflow-y-auto text-xs pr-1">
-                    <!-- Dynamic history rows -->
-                </div>
-            </div>
-
-            <!-- Backup & Restore Actions -->
-            <div class="border-t border-slate-800 pt-3 space-y-2 text-xs">
-                <h4 class="font-bold text-slate-300">데이터 백업 & 복구</h4>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="exportDataJSON()" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold border border-slate-700">
-                        <i class="fa-solid fa-[#fa-download] fa-download mr-1"></i>백업 저장(JSON)
-                    </button>
-                    <label class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold border border-slate-700 text-center cursor-pointer">
-                        <i class="fa-solid fa-[#fa-upload] fa-upload mr-1"></i>데이터 불러오기
-                        <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
-                    </label>
-                </div>
-                <button onclick="resetAllData()" class="w-full py-1.5 text-rose-400 hover:text-rose-300 text-[11px]">
-                    초기 상태로 데이터 리셋
-                </button>
-            </div>
+      <div class="card">
+        <div class="card-title">
+          <span>말출 출발일 역산기</span>
+          <button class="btn btn-soft btn-sm" id="btnApplyRemainToMalchul">잔여일수 적용</button>
         </div>
-    </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="malchulDays">말출 사용 일수 (일)</label>
+            <input type="number" id="malchulDays" min="1" value="15" />
+          </div>
+          <div class="field">
+            <label for="malchulType">복귀 방식</label>
+            <select id="malchulType">
+              <option value="no-return">미복귀 전역 (전역일 종료)</option>
+              <option value="return-before">전역 전날 복귀</option>
+            </select>
+          </div>
+        </div>
+        <div class="malchul-result">
+          <div class="card-sub">예상 말출 출발일</div>
+          <div class="malchul-date" id="malchulStartOut">-</div>
+          <div class="malchul-desc" id="malchulDescOut">-</div>
+        </div>
+        <button class="btn btn-primary" id="btnAddMalchulPlan" style="margin-top: 12px;">
+          이 일정으로 말출 계획표에 등록하기
+        </button>
+      </div>
+    </section>
 
-    <!-- Application Script Logic -->
-    <script>
-        // Default standard 28+ PX items database
-        const DEFAULT_CATALOG = [
-            { id: 1, name: "몬테크리스토 샌드위치", price: 2800, category: "식품/냉동", fav: true },
-            { id: 2, name: "슈넬치킨", price: 3900, category: "식품/냉동", fav: true },
-            { id: 3, name: "CJ 비비고 왕교자", price: 4200, category: "식품/냉동", fav: false },
-            { id: 4, name: "오뚜기 컵밥 (불고기)", price: 2500, category: "식품/냉동", fav: false },
-            { id: 5, name: "빅팜 소세지", price: 1800, category: "식품/냉동", fav: true },
-            { id: 6, name: "면사랑 까르보나라", price: 3400, category: "식품/냉동", fav: false },
-            { id: 7, name: "홍진경 더만두", price: 2600, category: "식품/냉동", fav: false },
-            { id: 8, name: "딸기 몽쉘 통통 (6입)", price: 1900, category: "간식/음료", fav: true },
-            { id: 9, name: "포카리스웨트 500ml", price: 900, category: "간식/음료", fav: true },
-            { id: 10, name: "코카콜라 Zero 355ml", price: 850, category: "간식/음료", fav: false },
-            { id: 11, name: "닥터지 블랙스네일 크림", price: 7300, category: "뷰티/생필품", fav: true },
-            { id: 12, name: "닥터지 레드 블레미쉬 수분크림", price: 6800, category: "뷰티/생필품", fav: true },
-            { id: 13, name: "AHC 아이크림 30ml", price: 4900, category: "뷰티/생필품", fav: false },
-            { id: 14, name: "이니스프리 그린티 스킨", price: 5500, category: "뷰티/생필품", fav: false },
-            { id: 15, name: "독도 토너 200ml", price: 4200, category: "뷰티/생필품", fav: false },
-            { id: 16, name: "불닭볶음면 (용기)", price: 1100, category: "간식/음료", fav: false },
-            { id: 17, name: "신라면 컵", price: 950, category: "간식/음료", fav: false },
-            { id: 18, name: "몬스터 에너기 드링크", price: 1200, category: "간식/음료", fav: true },
-            { id: 19, name: "페레로로쉐 (3구)", price: 1500, category: "간식/음료", fav: false },
-            { id: 20, name: "크리스피 롤 12곡", price: 2100, category: "간식/음료", fav: false },
-            { id: 21, name: "카누 아메리카노 (30T)", price: 4500, category: "간식/음료", fav: false },
-            { id: 22, name: "질러 육포", price: 3200, category: "간식/음료", fav: false },
-            { id: 23, name: "우르오스 올인원 모이스처", price: 8900, category: "뷰티/생필품", fav: false },
-            { id: 24, name: "센카 클렌징 폼 120g", price: 3100, category: "뷰티/생필품", fav: false },
-            { id: 25, name: "가리스 포마드 왁스", price: 4800, category: "뷰티/생필품", fav: false },
-            { id: 26, name: "도루코 7중날 면도날(4입)", price: 8500, category: "뷰티/생필품", fav: false },
-            { id: 27, name: "리스테린 쿨민트 500ml", price: 3300, category: "뷰티/생필품", fav: false },
-            { id: 28, name: "페브리즈 탈취제 370ml", price: 3600, category: "뷰티/생필품", fav: false }
-        ];
+    <!-- TAB 2: 휴가 일정표 -->
+    <section class="tab-panel" id="tab-plans">
+      <div class="card">
+        <div class="card-title">
+          <span id="formHeading">새 휴가·외박 일정 추가</span>
+          <button class="btn btn-gray btn-sm" id="btnCancelEdit" style="display:none;">취소</button>
+        </div>
+        <input type="hidden" id="editPlanId" value="" />
+        <div class="grid-2">
+          <div class="field">
+            <label for="planTitle">일정명</label>
+            <input type="text" id="planTitle" placeholder="예: 1월 스키장 여행" />
+          </div>
+          <div class="field">
+            <label for="planType">구분</label>
+            <select id="planType">
+              <option value="중간휴가">중간휴가</option>
+              <option value="말출">말출 (말년휴가)</option>
+              <option value="외박/외출">외박/외출</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="planStart">시작일</label>
+            <input type="date" id="planStart" />
+          </div>
+          <div class="field">
+            <label for="planEnd">종료일</label>
+            <input type="date" id="planEnd" />
+          </div>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="planNoDeduct" />
+          <span>휴가 일수 차감 안 함 (외박·외출 등)</span>
+        </label>
+        <div class="field">
+          <label for="planMemo">메모 (교통, 예약, 목표 등)</label>
+          <textarea id="planMemo" rows="2" placeholder="예: KTX 6호차 창가 예매, 국외여행 허가 신청"></textarea>
+        </div>
+        <button class="btn btn-primary" id="btnSavePlan">일정 저장</button>
+      </div>
 
-        // Global State Object
-        let state = {
-            isSplitPayment: true, // Split payment toggle state (Key User Request)
-            isPaydayMode: false,  // Payday 10th mode toggle state
-            userCards: {
-                ibk: { own: true, salaryTransfer: true, over30kLimit: 50000, over30kCount: 2 },
-                shinhan: { own: true, limit: 100000 },
-                hana: { own: true, limit: 100000 }
-            },
-            cart: [], // Items in shopping cart: [{ id, name, price, qty }]
-            catalog: [], // PX catalog items
-            history: [], // Completed payment receipt history
-            activeCategoryFilter: 'all'
+      <div class="card">
+        <div class="card-title">
+          <span>등록된 일정 목록</span>
+          <span class="card-sub" id="planCountText">0건</span>
+        </div>
+        <div id="planList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 체크리스트 -->
+    <section class="tab-panel" id="tab-checklist">
+      <div class="card">
+        <div class="card-title">
+          <span>말출 & 전역 체크리스트</span>
+          <span class="card-sub" id="checkProgressText">0 / 0 완료</span>
+        </div>
+        <div class="grid-2" style="margin-bottom: 10px;">
+          <select id="checkCategory">
+            <option value="행정·인수인계">행정·인수인계</option>
+            <option value="전역 준비">전역 준비</option>
+            <option value="말출 목표">말출 목표</option>
+          </select>
+          <input type="text" id="checkInput" placeholder="항목 입력 후 추가" />
+        </div>
+        <button class="btn btn-primary" id="btnAddCheck">체크리스트 항목 추가</button>
+      </div>
+
+      <div class="card" id="checklistContainer"></div>
+    </section>
+
+    <!-- TAB 4: 설정 및 백업 -->
+    <section class="tab-panel" id="tab-settings">
+      <div class="card">
+        <div class="card-title">복무 기간 설정</div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="setEnlist">입대일</label>
+            <input type="date" id="setEnlist" />
+          </div>
+          <div class="field">
+            <label for="setDischarge">전역일</label>
+            <input type="date" id="setDischarge" />
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btnSaveDates">날짜 적용</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">데이터 백업 & 복원</div>
+        <p style="font-size: 13px; color: var(--sub); margin-bottom: 12px;">
+          데이터는 현재 브라우저에 자동 저장됩니다. 기기를 바꾸거나 초기화할 때 아래 백업 기능을 사용하세요.
+        </p>
+        <div class="grid-2" style="margin-bottom: 10px;">
+          <button class="btn btn-soft" id="btnExportJson">JSON 백업 복사</button>
+          <button class="btn btn-gray" id="btnImportJson">JSON 붙여넣기 복원</button>
+        </div>
+        <button class="btn btn-danger-soft" id="btnResetAll" style="width: 100%;">전체 데이터 초기화</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bottom Tab Navigation -->
+  <nav class="tab-bar" id="tabBar">
+    <button class="tab-btn active" data-tab="tab-dashboard">
+      <span class="tab-icon">📊</span>
+      <span>현황·말출</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-plans">
+      <span class="tab-icon">🗓️</span>
+      <span>휴가일정</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-checklist">
+      <span class="tab-icon">✅</span>
+      <span>체크리스트</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-settings">
+      <span class="tab-icon">⚙️</span>
+      <span>설정</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast">저장되었습니다.</div>
+
+  <script>
+    const STORAGE_KEY = 'roka_leave_planner_v1';
+
+    const DEFAULT_STATE = {
+      enlistDate: '2026-01-26',
+      dischargeDate: '2027-07-25',
+      leavePool: {
+        annual: 15,
+        reward: 10,
+        other: 0,
+        expected: 5
+      },
+      malchulCalc: {
+        days: 15,
+        type: 'no-return'
+      },
+      plans: [
+        {
+          id: 'p1',
+          title: '12월 연말 외박',
+          type: '외박/외출',
+          start: '2026-12-19',
+          end: '2026-12-20',
+          noDeduct: true,
+          memo: '가족 모임 / 부대 인근 숙소'
+        },
+        {
+          id: 'p2',
+          title: '1월 스키장 여행',
+          type: '중간휴가',
+          start: '2027-01-14',
+          end: '2027-01-17',
+          noDeduct: false,
+          memo: '3박 4일 비발디파크 리프트권 및 장비 예약'
+        },
+        {
+          id: 'p3',
+          title: '3월 후쿠오카 여행',
+          type: '중간휴가',
+          start: '2027-03-11',
+          end: '2027-03-17',
+          noDeduct: false,
+          memo: '국외여행 허가 출국 1~2개월 전 신청 필수 / 김해공항 출국'
+        }
+      ],
+      checklist: [
+        { id: 'c1', category: '행정·인수인계', text: '후임 업무 인수인계서 작성 및 완료 (말출 2주 전)', done: false },
+        { id: 'c2', category: '행정·인수인계', text: '국외여행 허가 신청 및 여권 유효기간 확인', done: false },
+        { id: 'c3', category: '행정·인수인계', text: '부대 1회 최대 출타 일수 및 미복귀 전역 규정 확인', done: false },
+        { id: 'c4', category: '전역 준비', text: '보급품 반납 목록 점검 및 세탁', done: false },
+        { id: 'c5', category: '전역 준비', text: '장병내일준비적금 만기 해지 서류(가입자격확인서/전역증) 체크', done: false },
+        { id: 'c6', category: '말출 목표', text: '전역 전 운동 목표(3대 500) 최종 측정', done: false },
+        { id: 'c7', category: '말출 목표', text: '복학 및 시험 준비 생활 루틴 세팅', done: false }
+      ]
+    };
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(DEFAULT_STATE);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(DEFAULT_STATE),
+          ...parsed,
+          leavePool: { ...DEFAULT_STATE.leavePool, ...(parsed.leavePool || {}) },
+          malchulCalc: { ...DEFAULT_STATE.malchulCalc, ...(parsed.malchulCalc || {}) }
         };
+      } catch {
+        return structuredClone(DEFAULT_STATE);
+      }
+    }
 
-        // Initialize App on DOM Load
-        window.onload = function() {
-            loadLocalStorage();
-            renderAll();
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    // Date Helpers (Timezone-safe)
+    function parseDate(str) {
+      if (!str) return null;
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatKoreanDate(str) {
+      const d = parseDate(str);
+      if (!d) return '-';
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]})`;
+    }
+
+    function calcInclusiveDays(startStr, endStr) {
+      const s = parseDate(startStr);
+      const e = parseDate(endStr);
+      if (!s || !e || e < s) return 0;
+      return Math.round((e - s) / 86400000) + 1;
+    }
+
+    function addDays(date, offset) {
+      const copy = new Date(date.getTime());
+      copy.setDate(copy.getDate() + offset);
+      return copy;
+    }
+
+    // Render Hero
+    function renderHero() {
+      const today = new Date();
+      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const enlist = parseDate(state.enlistDate);
+      const discharge = parseDate(state.dischargeDate);
+
+      const totalDays = Math.max(1, Math.round((discharge - enlist) / 86400000));
+      const servedDays = Math.min(totalDays, Math.max(0, Math.round((todayMidnight - enlist) / 86400000)));
+      const remainDays = Math.round((discharge - todayMidnight) / 86400000);
+      const percent = Math.min(100, Math.max(0, (servedDays / totalDays) * 100));
+
+      document.getElementById('heroDday').textContent =
+        remainDays > 0 ? `D-${remainDays}` : remainDays === 0 ? 'D-DAY' : `전역 +${Math.abs(remainDays)}`;
+      document.getElementById('heroPercent').textContent = `${percent.toFixed(1)}%`;
+      document.getElementById('heroProgressBar').style.width = `${percent}%`;
+      document.getElementById('heroEnlistText').textContent = `입대 ${state.enlistDate.replaceAll('-', '.')}`;
+      document.getElementById('heroDischargeText').textContent = `전역 ${state.dischargeDate.replaceAll('-', '.')}`;
+      document.getElementById('heroServedText').textContent = `복무 ${servedDays}일 / 전체 ${totalDays}일`;
+    }
+
+    // Render Dashboard & Malchul Calculator
+    function getLeaveSummary() {
+      const { annual, reward, other, expected } = state.leavePool;
+      const total = Number(annual || 0) + Number(reward || 0) + Number(other || 0) + Number(expected || 0);
+      const used = state.plans.reduce((sum, p) => {
+        if (p.noDeduct) return sum;
+        return sum + calcInclusiveDays(p.start, p.end);
+      }, 0);
+      return { total, used, remain: total - used };
+    }
+
+    function renderDashboard() {
+      const { annual, reward, other, expected } = state.leavePool;
+      document.getElementById('inAnnual').value = annual;
+      document.getElementById('inReward').value = reward;
+      document.getElementById('inOther').value = other;
+      document.getElementById('inExpected').value = expected;
+
+      const { total, used, remain } = getLeaveSummary();
+      document.getElementById('statTotal').textContent = `${total}일`;
+      document.getElementById('statUsed').textContent = `${used}일`;
+      const remainEl = document.getElementById('statRemain');
+      remainEl.textContent = `${remain}일`;
+      remainEl.className = `stat-val ${remain < 0 ? 'danger' : 'success'}`;
+
+      document.getElementById('malchulDays').value = state.malchulCalc.days;
+      document.getElementById('malchulType').value = state.malchulCalc.type;
+      renderMalchulPreview();
+    }
+
+    function getMalchulRange() {
+      const days = Math.max(1, Number(state.malchulCalc.days || 1));
+      const discharge = parseDate(state.dischargeDate);
+      const isNoReturn = state.malchulCalc.type === 'no-return';
+      const endDate = isNoReturn ? discharge : addDays(discharge, -1);
+      const startDate = addDays(endDate, -(days - 1));
+      return { startStr: formatDate(startDate), endStr: formatDate(endDate), days, isNoReturn };
+    }
+
+    function renderMalchulPreview() {
+      const { startStr, endStr, days, isNoReturn } = getMalchulRange();
+      const nights = days - 1;
+      document.getElementById('malchulStartOut').textContent = formatKoreanDate(startStr);
+      document.getElementById('malchulDescOut').textContent =
+        `${nights}박 ${days}일 (${formatKoreanDate(startStr)} ~ ${formatKoreanDate(endStr)}) · ${isNoReturn ? '미복귀 전역' : '전역 전날 복귀'}`;
+    }
+
+    // Render Plans
+    function renderPlans() {
+      const list = document.getElementById('planList');
+      const sorted = [...state.plans].sort((a, b) => a.start.localeCompare(b.start));
+      document.getElementById('planCountText').textContent = `${sorted.length}건`;
+
+      if (sorted.length === 0) {
+        list.innerHTML = `<div class="empty-state">등록된 휴가 일정이 없습니다. 위에서 새 일정을 추가해 보세요.</div>`;
+        return;
+      }
+
+      list.innerHTML = sorted.map(p => {
+        const days = calcInclusiveDays(p.start, p.end);
+        const nights = Math.max(0, days - 1);
+        const isMalchul = p.type === '말출';
+        const badgeClass = isMalchul ? 'badge-malchul' : (p.type === '외박/외출' ? 'badge-pass' : 'badge-leave');
+        const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
+
+        return `
+          <div class="plan-item ${isMalchul ? 'is-malchul' : ''}" data-id="${p.id}">
+            <div class="plan-top">
+              <div class="plan-title">${escapeHtml(p.title)}</div>
+              <span class="badge ${badgeClass}">${p.type}</span>
+            </div>
+            <div class="plan-meta">
+              ${formatKoreanDate(p.start)} ~ ${formatKoreanDate(p.end)} · <strong>${nights}박 ${days}일</strong> (${deductText})
+            </div>
+            ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
+            <div class="plan-actions">
+              <button class="btn btn-gray btn-sm" data-action="edit" data-id="${p.id}">수정</button>
+              <button class="btn btn-danger-soft btn-sm" data-action="delete" data-id="${p.id}">삭제</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Checklist
+    function renderChecklist() {
+      const container = document.getElementById('checklistContainer');
+      const total = state.checklist.length;
+      const done = state.checklist.filter(c => c.done).length;
+      document.getElementById('checkProgressText').textContent = `${done} / ${total} 완료`;
+
+      if (total === 0) {
+        container.innerHTML = `<div class="empty-state">체크리스트 항목이 없습니다.</div>`;
+        return;
+      }
+
+      const categories = ['행정·인수인계', '전역 준비', '말출 목표'];
+      container.innerHTML = categories.map(cat => {
+        const items = state.checklist.filter(c => c.category === cat);
+        if (items.length === 0) return '';
+        return `
+          <div class="check-group-title">${cat}</div>
+          ${items.map(item => `
+            <div class="check-item">
+              <label class="check-left">
+                <input type="checkbox" data-action="toggle-check" data-id="${item.id}" ${item.done ? 'checked' : ''} />
+                <span class="check-text ${item.done ? 'done' : ''}">${escapeHtml(item.text)}</span>
+              </label>
+              <button class="btn btn-danger-soft btn-sm" data-action="delete-check" data-id="${item.id}">삭제</button>
+            </div>
+          `).join('')}
+        `;
+      }).join('');
+    }
+
+    function renderSettings() {
+      document.getElementById('setEnlist').value = state.enlistDate;
+      document.getElementById('setDischarge').value = state.dischargeDate;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+    }
+
+    function renderAll() {
+      renderHero();
+      renderDashboard();
+      renderPlans();
+      renderChecklist();
+      renderSettings();
+    }
+
+    // Event Listeners: Tabs
+    document.getElementById('tabBar').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+
+    // Event Listeners: Leave Pool Inputs
+    ['inAnnual', 'inReward', 'inOther', 'inExpected'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        state.leavePool = {
+          annual: Math.max(0, Number(document.getElementById('inAnnual').value || 0)),
+          reward: Math.max(0, Number(document.getElementById('inReward').value || 0)),
+          other: Math.max(0, Number(document.getElementById('inOther').value || 0)),
+          expected: Math.max(0, Number(document.getElementById('inExpected').value || 0))
         };
+        saveState();
+        renderDashboard();
+      });
+    });
 
-        // Save State to LocalStorage
-        function saveState() {
-            localStorage.setItem('px_cardmaster_state_v2', JSON.stringify(state));
+    // Event Listeners: Malchul Calculator
+    document.getElementById('malchulDays').addEventListener('input', (e) => {
+      state.malchulCalc.days = Math.max(1, Number(e.target.value || 1));
+      saveState();
+      renderMalchulPreview();
+    });
+
+    document.getElementById('malchulType').addEventListener('change', (e) => {
+      state.malchulCalc.type = e.target.value;
+      saveState();
+      renderMalchulPreview();
+    });
+
+    document.getElementById('btnApplyRemainToMalchul').addEventListener('click', () => {
+      const { remain } = getLeaveSummary();
+      if (remain <= 0) {
+        showToast('남은 휴가 일수가 1일 이상이어야 합니다.');
+        return;
+      }
+      state.malchulCalc.days = remain;
+      saveState();
+      renderDashboard();
+      showToast(`잔여 휴가 ${remain}일이 적용되었습니다.`);
+    });
+
+    document.getElementById('btnAddMalchulPlan').addEventListener('click', () => {
+      const { startStr, endStr, isNoReturn } = getMalchulRange();
+      const existing = state.plans.find(p => p.type === '말출');
+      if (existing) {
+        existing.start = startStr;
+        existing.end = endStr;
+        existing.memo = isNoReturn ? '미복귀 전역 말출' : '전역 전날 복귀 말출';
+      } else {
+        state.plans.push({
+          id: 'p_' + Date.now(),
+          title: '말년휴가 (말출)',
+          type: '말출',
+          start: startStr,
+          end: endStr,
+          noDeduct: false,
+          memo: isNoReturn ? '미복귀 전역 말출' : '전역 전날 복귀 말출'
+        });
+      }
+      saveState();
+      renderAll();
+      showToast('말출 일정이 휴가 일정표에 반영되었습니다.');
+    });
+
+    // Event Listeners: Plan Form
+    document.getElementById('planType').addEventListener('change', (e) => {
+      document.getElementById('planNoDeduct').checked = e.target.value === '외박/외출';
+    });
+
+    function resetPlanForm() {
+      document.getElementById('editPlanId').value = '';
+      document.getElementById('planTitle').value = '';
+      document.getElementById('planType').value = '중간휴가';
+      document.getElementById('planStart').value = '';
+      document.getElementById('planEnd').value = '';
+      document.getElementById('planNoDeduct').checked = false;
+      document.getElementById('planMemo').value = '';
+      document.getElementById('formHeading').textContent = '새 휴가·외박 일정 추가';
+      document.getElementById('btnCancelEdit').style.display = 'none';
+    }
+
+    document.getElementById('btnCancelEdit').addEventListener('click', resetPlanForm);
+
+    document.getElementById('btnSavePlan').addEventListener('click', () => {
+      const id = document.getElementById('editPlanId').value;
+      const title = document.getElementById('planTitle').value.trim();
+      const type = document.getElementById('planType').value;
+      const start = document.getElementById('planStart').value;
+      const end = document.getElementById('planEnd').value;
+      const noDeduct = document.getElementById('planNoDeduct').checked;
+      const memo = document.getElementById('planMemo').value.trim();
+
+      if (!title || !start || !end) {
+        showToast('일정명과 시작일, 종료일을 모두 입력해 주세요.');
+        return;
+      }
+      if (calcInclusiveDays(start, end) <= 0) {
+        showToast('종료일은 시작일과 같거나 이후여야 합니다.');
+        return;
+      }
+
+      if (id) {
+        const target = state.plans.find(p => p.id === id);
+        if (target) Object.assign(target, { title, type, start, end, noDeduct, memo });
+        showToast('일정이 수정되었습니다.');
+      } else {
+        state.plans.push({ id: 'p_' + Date.now(), title, type, start, end, noDeduct, memo });
+        showToast('새 일정이 추가되었습니다.');
+      }
+
+      saveState();
+      resetPlanForm();
+      renderAll();
+    });
+
+    // Event Delegation: Plan List
+    document.getElementById('planList').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const { action, id } = btn.dataset;
+
+      if (action === 'delete') {
+        if (!confirm('이 일정을 삭제할까요?')) return;
+        state.plans = state.plans.filter(p => p.id !== id);
+        saveState();
+        renderAll();
+        showToast('일정이 삭제되었습니다.');
+      } else if (action === 'edit') {
+        const p = state.plans.find(item => item.id === id);
+        if (!p) return;
+        document.getElementById('editPlanId').value = p.id;
+        document.getElementById('planTitle').value = p.title;
+        document.getElementById('planType').value = p.type;
+        document.getElementById('planStart').value = p.start;
+        document.getElementById('planEnd').value = p.end;
+        document.getElementById('planNoDeduct').checked = !!p.noDeduct;
+        document.getElementById('planMemo').value = p.memo || '';
+        document.getElementById('formHeading').textContent = '일정 수정 중';
+        document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    // Event Listeners: Checklist
+    document.getElementById('btnAddCheck').addEventListener('click', () => {
+      const category = document.getElementById('checkCategory').value;
+      const input = document.getElementById('checkInput');
+      const text = input.value.trim();
+      if (!text) {
+        showToast('항목 내용을 입력해 주세요.');
+        return;
+      }
+      state.checklist.push({ id: 'c_' + Date.now(), category, text, done: false });
+      input.value = '';
+      saveState();
+      renderChecklist();
+      showToast('체크리스트에 추가되었습니다.');
+    });
+
+    document.getElementById('checklistContainer').addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+      const { action, id } = target.dataset;
+
+      if (action === 'toggle-check') {
+        const item = state.checklist.find(c => c.id === id);
+        if (item) {
+          item.done = target.checked;
+          saveState();
+          renderChecklist();
         }
+      } else if (action === 'delete-check') {
+        state.checklist = state.checklist.filter(c => c.id !== id);
+        saveState();
+        renderChecklist();
+        showToast('항목이 삭제되었습니다.');
+      }
+    });
 
-        // Load State from LocalStorage
-        function loadLocalStorage() {
-            const saved = localStorage.getItem('px_cardmaster_state_v2');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state = { ...state, ...parsed };
-                } catch(e) {
-                    console.error("Failed to parse saved state", e);
-                    state.catalog = [...DEFAULT_CATALOG];
-                }
-            } else {
-                state.catalog = [...DEFAULT_CATALOG];
-            }
+    // Event Listeners: Settings & Backup
+    document.getElementById('btnSaveDates').addEventListener('click', () => {
+      const enlist = document.getElementById('setEnlist').value;
+      const discharge = document.getElementById('setDischarge').value;
+      if (!enlist || !discharge || parseDate(discharge) <= parseDate(enlist)) {
+        showToast('올바른 입대일과 전역일을 입력해 주세요.');
+        return;
+      }
+      state.enlistDate = enlist;
+      state.dischargeDate = discharge;
+      saveState();
+      renderAll();
+      showToast('복무 기간이 업데이트되었습니다.');
+    });
+
+    document.getElementById('btnExportJson').addEventListener('click', async () => {
+      const json = JSON.stringify(state, null, 2);
+      try {
+        await navigator.clipboard.writeText(json);
+        showToast('백업 JSON이 클립보드에 복사되었습니다.');
+      } catch {
+        prompt('아래 JSON을 복사해 보관하세요:', json);
+      }
+    });
+
+    document.getElementById('btnImportJson').addEventListener('click', () => {
+      const raw = prompt('백업해 둔 JSON 데이터를 붙여넣으세요:');
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.dischargeDate || !Array.isArray(parsed.plans)) {
+          throw new Error('Invalid format');
         }
-
-        // Main Render Controller
-        function renderAll() {
-            renderTogglesUI();
-            renderCartUI();
-            renderQuickFavoritesUI();
-            renderCardLimitsStatusUI();
-            calculateAndRenderRecommendation();
-            saveState();
-        }
-
-        // Render Toggles UI (Payday & Split Payment)
-        function renderTogglesUI() {
-            // Split Payment Toggle UI
-            const splitBtn = document.getElementById('splitPaymentToggleBtn');
-            const splitBadge = document.getElementById('splitPaymentStatusBadge');
-            const splitGuideBtn = document.getElementById('splitGuideBtn');
-            const planBadge = document.getElementById('planModeBadge');
-
-            if (state.isSplitPayment) {
-                splitBtn.className = "flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 border border-emerald-500/60 transition-all text-xs shadow-md shadow-emerald-500/10";
-                splitBadge.className = "font-extrabold px-2 py-0.5 rounded-full text-[11px] bg-emerald-500 text-slate-950";
-                splitBadge.innerText = "ON (분할결제)";
-                splitGuideBtn.classList.remove('hidden');
-                planBadge.innerText = "분할 결제 강추";
-                planBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-            } else {
-                splitBtn.className = "flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 transition-all text-xs opacity-70";
-                splitBadge.className = "font-extrabold px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-400";
-                splitBadge.innerText = "OFF (단일결제)";
-                splitGuideBtn.classList.add('hidden');
-                planBadge.innerText = "단일 카드 결제";
-                planBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30";
-            }
-
-            // Payday Mode Toggle UI
-            const paydayBtn = document.getElementById('paydayToggleBtn');
-            const paydayBadge = document.getElementById('paydayStatusBadge');
-
-            if (state.isPaydayMode) {
-                paydayBtn.className = "flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 border border-amber-500/60 transition-all text-xs";
-                paydayBadge.className = "font-bold px-2 py-0.5 rounded-full text-[11px] bg-amber-500 text-slate-950";
-                paydayBadge.innerText = "ON (10일)";
-            } else {
-                paydayBtn.className = "flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 transition-all text-xs opacity-70";
-                paydayBadge.className = "font-bold px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-400";
-                paydayBadge.innerText = "OFF";
-            }
-        }
-
-        // Toggle Split Payment ON/OFF
-        function toggleSplitPaymentMode() {
-            state.isSplitPayment = !state.isSplitPayment;
-            renderAll();
-        }
-
-        // Toggle Payday Mode ON/OFF
-        function togglePaydayMode() {
-            state.isPaydayMode = !state.isPaydayMode;
-            renderAll();
-        }
-
-        // Render Cart Items
-        function renderCartUI() {
-            const container = document.getElementById('cartItemsContainer');
-            const totalText = document.getElementById('cartTotalText');
-            const countBadge = document.getElementById('cartCountBadge');
-
-            let total = 0;
-            let itemCount = 0;
-
-            if (state.cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-6 text-slate-500 text-xs">
-                        <i class="fa-solid fa-basket-shopping text-2xl mb-1 text-slate-600 block"></i>
-                        장바구니가 비어있습니다.<br>아래 카탈로그나 퀵 바에서 물품을 담아보세요!
-                    </div>
-                `;
-            } else {
-                let html = '';
-                state.cart.forEach(item => {
-                    const subtotal = item.price * item.qty;
-                    total += subtotal;
-                    itemCount += item.qty;
-
-                    html += `
-                        <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
-                            <div class="flex-1 min-w-0 pr-2">
-                                <div class="font-bold text-slate-200 truncate">${item.name}</div>
-                                <div class="text-[11px] text-slate-400">${item.price.toLocaleString()}원 × ${item.qty} = <span class="text-emerald-400 font-semibold">${subtotal.toLocaleString()}원</span></div>
-                            </div>
-                            <div class="flex items-center space-x-1.5">
-                                <div class="flex items-center bg-slate-900 rounded-lg border border-slate-800">
-                                    <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 flex items-center justify-center text-slate-300 hover:bg-slate-800 rounded-l-lg font-bold">-</button>
-                                    <span class="w-6 text-center font-bold text-slate-200 text-[11px]">${item.qty}</span>
-                                    <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 flex items-center justify-center text-slate-300 hover:bg-slate-800 rounded-r-lg font-bold">+</button>
-                                </div>
-                                <button onclick="removeCartItem(${item.id})" class="text-slate-500 hover:text-rose-400 p-1">
-                                    <i class="fa-solid fa-xmark text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            }
-
-            totalText.innerText = total.toLocaleString();
-            countBadge.innerText = `${itemCount}개`;
-        }
-
-        // Add Item to Cart
-        function addToCart(catalogId) {
-            const item = state.catalog.find(c => c.id === catalogId);
-            if (!item) return;
-
-            const existing = state.cart.find(c => c.id === catalogId);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                state.cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
-            }
-            renderAll();
-        }
-
-        // Update Cart Quantity
-        function updateCartQty(id, delta) {
-            const existing = state.cart.find(c => c.id === id);
-            if (existing) {
-                existing.qty += delta;
-                if (existing.qty <= 0) {
-                    state.cart = state.cart.filter(c => c.id !== id);
-                }
-            }
-            renderAll();
-        }
-
-        // Remove Single Cart Item
-        function removeCartItem(id) {
-            state.cart = state.cart.filter(c => c.id !== id);
-            renderAll();
-        }
-
-        // Clear Entire Cart
-        function clearCart() {
-            state.cart = [];
-            renderAll();
-        }
-
-        // Render Quick Favorites Horizontal Bar
-        function renderQuickFavoritesUI() {
-            const container = document.getElementById('quickFavoritesBar');
-            const favorites = state.catalog.filter(item => item.fav);
-
-            if (favorites.length === 0) {
-                container.innerHTML = `<span class="text-[11px] text-slate-500 py-1">카탈로그에서 ⭐을 클릭해 즐겨찾기를 추가해 보세요.</span>`;
-                return;
-            }
-
-            let html = '';
-            favorites.forEach(item => {
-                html += `
-                    <button onclick="addToCart(${item.id})" class="flex-shrink-0 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 px-2.5 py-1.5 rounded-xl text-xs flex items-center space-x-1.5 active:scale-95 transition">
-                        <span class="font-medium text-slate-200 truncate max-w-[90px]">${item.name}</span>
-                        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-500/20">${item.price.toLocaleString()}원</span>
-                    </button>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // Render Card Limits Status Grid
-        function renderCardLimitsStatusUI() {
-            document.getElementById('statusIBKLimit').innerText = `${state.userCards.ibk.over30kLimit.toLocaleString()}원`;
-            document.getElementById('statusIBKCount').innerText = `3만원↑ ${state.userCards.ibk.over30kCount}회 남음`;
-
-            document.getElementById('statusShinhanLimit').innerText = `${state.userCards.shinhan.limit.toLocaleString()}원`;
-            document.getElementById('statusHanaLimit').innerText = `${state.userCards.hana.limit.toLocaleString()}원`;
-
-            // Sync Settings Inputs
-            document.getElementById('ownIBK').checked = state.userCards.ibk.own;
-            document.getElementById('ibkSalaryTransfer').checked = state.userCards.ibk.salaryTransfer;
-            document.getElementById('ibkOver30kLimit').value = state.userCards.ibk.over30kLimit;
-            document.getElementById('ibkOver30kCount').value = state.userCards.ibk.over30kCount;
-
-            document.getElementById('ownShinhan').checked = state.userCards.shinhan.own;
-            document.getElementById('shinhanLimit').value = state.userCards.shinhan.limit;
-
-            document.getElementById('ownHana').checked = state.userCards.hana.own;
-            document.getElementById('hanaLimit').value = state.userCards.hana.limit;
-        }
-
-        // Save User Settings From Modal
-        function saveUserSettings() {
-            state.userCards.ibk.own = document.getElementById('ownIBK').checked;
-            state.userCards.ibk.salaryTransfer = document.getElementById('ibkSalaryTransfer').checked;
-            state.userCards.ibk.over30kLimit = parseInt(document.getElementById('ibkOver30kLimit').value) || 0;
-            state.userCards.ibk.over30kCount = parseInt(document.getElementById('ibkOver30kCount').value) || 0;
-
-            state.userCards.shinhan.own = document.getElementById('ownShinhan').checked;
-            state.userCards.shinhan.limit = parseInt(document.getElementById('shinhanLimit').value) || 0;
-
-            state.userCards.hana.own = document.getElementById('ownHana').checked;
-            state.userCards.hana.limit = parseInt(document.getElementById('hanaLimit').value) || 0;
-
-            renderAll();
-        }
-
-        // Core Recommendation & Refund Optimization Engine
-        function calculateAndRenderRecommendation() {
-            const cartTotal = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const planList = document.getElementById('paymentPlanList');
-            const totalBadge = document.getElementById('totalCashbackBadge');
-            const tierBanner = document.getElementById('tierJumpBanner');
-            const tierBannerText = document.getElementById('tierJumpBannerText');
-
-            tierBanner.classList.add('hidden');
-
-            if (cartTotal === 0) {
-                planList.innerHTML = `
-                    <div class="text-center py-4 text-slate-500 text-xs">
-                        물품을 담으시면 3기 나라사랑카드 최적 결제 플랜이 즉시 계산됩니다.
-                    </div>
-                `;
-                totalBadge.innerText = "최대 환급 0원";
-                return;
-            }
-
-            // Check Tier Jump Tip Banner (If close to 30,000 KRW threshold for 20% discount)
-            if (cartTotal < 30000 && (30000 - cartTotal) <= 8000) {
-                const diff = 30000 - cartTotal;
-                tierBannerText.innerHTML = `<strong>💡 영끌 팁:</strong> <span class="text-amber-400 font-extrabold">${diff.toLocaleString()}원</span>만 더 담으면 <strong>신한/IBK카드 20% 고율 할인(3만원 이상)</strong> 구간에 진입합니다!`;
-                tierBanner.classList.remove('hidden');
-            }
-
-            if (state.isSplitPayment) {
-                // Multi-Card Split Optimization Strategy
-                calculateSplitPaymentPlan(cartTotal);
-            } else {
-                // Single Card Payment Strategy
-                calculateSinglePaymentPlan(cartTotal);
-            }
-        }
-
-        // Strategy A: Multi-card Split Payment Strategy
-        function calculateSplitPaymentPlan(total) {
-            const planList = document.getElementById('paymentPlanList');
-            const totalBadge = document.getElementById('totalCashbackBadge');
-
-            let steps = [];
-            let totalRefund = 0;
-
-            // Decision Logic for 3rd Gen Cards:
-            // 1. If total >= 30,000 KRW, split 30,000 KRW to Shinhan (or IBK) for 20% cashback (= +6,000 KRW)
-            // 2. Remaining amount (e.g., total - 30,000) goes to Hana for 30% discount (under 30,000 KRW) or IBK 10%
-            if (total >= 30000 && state.userCards.shinhan.own && state.userCards.shinhan.limit >= 6000) {
-                // Step 1: Shinhan Card 30,000 KRW
-                const step1Pay = 30000;
-                const step1Refund = Math.min(step1Pay * 0.20, state.userCards.shinhan.limit);
-                steps.push({
-                    card: "신한 나라사랑카드",
-                    amount: step1Pay,
-                    refund: step1Refund,
-                    desc: "3만 이상 20% 할인 (최대 구간)",
-                    color: "border-blue-500/40 text-blue-300"
-                });
-                totalRefund += step1Refund;
-
-                const remainder = total - step1Pay;
-                if (remainder > 0) {
-                    if (state.userCards.hana.own && state.userCards.hana.limit > 0) {
-                        // Hana 30% under 30k
-                        const step2Refund = Math.min(remainder * 0.30, state.userCards.hana.limit);
-                        steps.push({
-                            card: "하나 나라사랑카드",
-                            amount: remainder,
-                            refund: step2Refund,
-                            desc: "3만 미만 30% 집중 할인",
-                            color: "border-emerald-500/40 text-emerald-300"
-                        });
-                        totalRefund += step2Refund;
-                    } else if (state.userCards.ibk.own && state.userCards.ibk.over30kLimit > 0) {
-                        const step2Refund = Math.min(remainder * 0.10, state.userCards.ibk.over30kLimit);
-                        steps.push({
-                            card: "IBK 나라사랑카드",
-                            amount: remainder,
-                            refund: step2Refund,
-                            desc: "3만 미만 10% 할인",
-                            color: "border-blue-400/40 text-blue-400"
-                        });
-                        totalRefund += step2Refund;
-                    } else {
-                        steps.push({
-                            card: "잔액 (일반 결제)",
-                            amount: remainder,
-                            refund: 0,
-                            desc: "추가 한도 없음",
-                            color: "border-slate-700 text-slate-400"
-                        });
-                    }
-                }
-            } else if (total < 30000 && state.userCards.hana.own) {
-                // Total is under 30,000 KRW -> Best to pay with Hana Card (30% discount)
-                const refund = Math.min(total * 0.30, state.userCards.hana.limit);
-                steps.push({
-                    card: "하나 나라사랑카드",
-                    amount: total,
-                    refund: refund,
-                    desc: "3만 미만 30% 할인 (단일)",
-                    color: "border-emerald-500/40 text-emerald-300"
-                });
-                totalRefund += refund;
-            } else {
-                // Fallback single best card
-                let bestCard = "신한/IBK 나라사랑카드";
-                let rate = total >= 30000 ? 0.20 : 0.10;
-                let refund = total * rate;
-                steps.push({
-                    card: bestCard,
-                    amount: total,
-                    refund: refund,
-                    desc: `${total >= 30000 ? '20%' : '10%'} 일반 결제`,
-                    color: "border-blue-400/40 text-blue-300"
-                });
-                totalRefund += refund;
-            }
-
-            renderPlanListHTML(steps);
-            totalBadge.innerText = `최대 환급 +${Math.round(totalRefund).toLocaleString()}원`;
-        }
-
-        // Strategy B: Single Card Payment Strategy (When Split Payment is OFF)
-        function calculateSinglePaymentPlan(total) {
-            const planList = document.getElementById('paymentPlanList');
-            const totalBadge = document.getElementById('totalCashbackBadge');
-
-            let cardOptions = [];
-
-            // 1. Shinhan Single Option
-            if (state.userCards.shinhan.own) {
-                let rate = total >= 30000 ? 0.20 : 0.0;
-                let refund = Math.min(total * rate, state.userCards.shinhan.limit);
-                cardOptions.push({
-                    card: "신한 나라사랑카드",
-                    amount: total,
-                    refund: refund,
-                    desc: total >= 30000 ? "3만원 이상 20% 할인적용" : "3만원 미만 (할인 구간 미달)",
-                    color: "border-blue-500/40 text-blue-300"
-                });
-            }
-
-            // 2. Hana Single Option
-            if (state.userCards.hana.own) {
-                let rate = total < 30000 ? 0.30 : 0.10;
-                let refund = Math.min(total * rate, state.userCards.hana.limit);
-                cardOptions.push({
-                    card: "하나 나라사랑카드",
-                    amount: total,
-                    refund: refund,
-                    desc: total < 30000 ? "3만원 미만 30% 최고 할인" : "3만원 이상 (10% 할인)",
-                    color: "border-emerald-500/40 text-emerald-300"
-                });
-            }
-
-            // 3. IBK Single Option
-            if (state.userCards.ibk.own) {
-                let rate = (total >= 30000 && state.userCards.ibk.over30kCount > 0) ? 0.20 : 0.10;
-                let refund = Math.min(total * rate, state.userCards.ibk.over30kLimit);
-                cardOptions.push({
-                    card: "IBK 기업 나라사랑카드",
-                    amount: total,
-                    refund: refund,
-                    desc: total >= 30000 ? "3만원 이상 20% 할인 (횟수차감)" : "3만원 미만 10% 할인",
-                    color: "border-blue-400/40 text-blue-400"
-                });
-            }
-
-            // Sort by refund descending
-            cardOptions.sort((a, b) => b.refund - a.refund);
-
-            if (cardOptions.length === 0) {
-                planList.innerHTML = `<div class="text-xs text-rose-400 text-center py-2">보유 설정된 카드가 없습니다. 설정에서 카드를 체크하세요.</div>`;
-                totalBadge.innerText = "최대 환급 0원";
-                return;
-            }
-
-            // Render top 1 single best card & show runners up
-            const best = cardOptions[0];
-            let steps = [{
-                card: `⭐ [추천] ${best.card}`,
-                amount: best.amount,
-                refund: best.refund,
-                desc: `${best.desc} (전액 단일 결제)`,
-                color: best.color
-            }];
-
-            renderPlanListHTML(steps);
-            totalBadge.innerText = `단일 환급 +${Math.round(best.refund).toLocaleString()}원`;
-        }
-
-        // Render Recommendation Steps HTML
-        function renderPlanListHTML(steps) {
-            const planList = document.getElementById('paymentPlanList');
-            let html = '';
-            steps.forEach((s, idx) => {
-                html += `
-                    <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border ${s.color} text-xs">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-200 font-extrabold flex items-center justify-center text-[10px] border border-slate-700">${idx+1}</span>
-                            <div>
-                                <div class="font-extrabold text-white">${s.card} → <span class="text-amber-300">${s.amount.toLocaleString()}원</span></div>
-                                <div class="text-[10px] text-slate-400">${s.desc}</div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-black text-emerald-400 text-sm">+${Math.round(s.refund).toLocaleString()}원</span>
-                        </div>
-                    </div>
-                `;
-            });
-            planList.innerHTML = html;
-        }
-
-        // Open Receipt 2-Split Guide Modal
-        function openSplitGuideModal() {
-            const cartTotal = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            if (cartTotal < 30000) {
-                alert("총 금액이 3만원 미만일 때는 단일 하나카드로 전액 결제하는 것이 유리합니다.");
-                return;
-            }
-
-            const guideContent = document.getElementById('splitGuideContent');
-            
-            // Greedily split cart items to make Receipt A ~ 30,000 KRW
-            let receiptA = [];
-            let receiptB = [];
-            let totalA = 0;
-            let totalB = 0;
-
-            // Flat item list
-            let flatItems = [];
-            state.cart.forEach(i => {
-                for (let k = 0; k < i.qty; k++) {
-                    flatItems.push({ name: i.name, price: i.price });
-                }
-            });
-
-            // Sort descending by price to fill Receipt A first
-            flatItems.sort((a, b) => b.price - a.price);
-
-            flatItems.forEach(item => {
-                if (totalA < 30000 || (totalA < 32000 && totalA + item.price <= 35000)) {
-                    receiptA.push(item);
-                    totalA += item.price;
-                } else {
-                    receiptB.push(item);
-                    totalB += item.price;
-                }
-            });
-
-            let html = `
-                <!-- Receipt 1 -->
-                <div class="p-3 bg-slate-950 rounded-xl border border-blue-500/40 space-y-1.5">
-                    <div class="flex justify-between font-extrabold text-blue-300">
-                        <span>영수증 1 (신한/IBK 3만원 이상 20%)</span>
-                        <span>${totalA.toLocaleString()}원</span>
-                    </div>
-                    <div class="text-[11px] text-slate-400 space-y-0.5 border-t border-slate-800 pt-1.5">
-                        ${receiptA.map(i => `<div>• ${i.name} (${i.price.toLocaleString()}원)</div>`).join('')}
-                    </div>
-                    <div class="text-right text-[11px] text-emerald-400 font-bold pt-1">
-                        예상 환급: +${Math.round(totalA * 0.20).toLocaleString()}원
-                    </div>
-                </div>
-
-                <!-- Receipt 2 -->
-                <div class="p-3 bg-slate-950 rounded-xl border border-emerald-500/40 space-y-1.5">
-                    <div class="flex justify-between font-extrabold text-emerald-300">
-                        <span>영수증 2 (하나카드 3만원 미만 30%)</span>
-                        <span>${totalB.toLocaleString()}원</span>
-                    </div>
-                    <div class="text-[11px] text-slate-400 space-y-0.5 border-t border-slate-800 pt-1.5">
-                        ${receiptB.length > 0 ? receiptB.map(i => `<div>• ${i.name} (${i.price.toLocaleString()}원)</div>`).join('') : '<div class="text-slate-500">남은 물품 없음</div>'}
-                    </div>
-                    <div class="text-right text-[11px] text-emerald-400 font-bold pt-1">
-                        예상 환급: +${Math.round(totalB * 0.30).toLocaleString()}원
-                    </div>
-                </div>
-            `;
-
-            guideContent.innerHTML = html;
-            document.getElementById('splitGuideModal').classList.remove('hidden');
-        }
-
-        function closeSplitGuideModal() {
-            document.getElementById('splitGuideModal').classList.add('hidden');
-        }
-
-        // Open Limit Maximizer Modal ("한도 털어먹기")
-        function openLimitMaximizerModal() {
-            const content = document.getElementById('limitMaximizerContent');
-            const cartTotal = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-            const ibkRem = state.userCards.ibk.over30kLimit;
-            const shinhanRem = state.userCards.shinhan.limit;
-            const hanaRem = state.userCards.hana.limit;
-
-            // Target calculations to maximize refund limits
-            const maxShinhanSpend = Math.round(shinhanRem / 0.20);
-            const maxHanaSpend = Math.round(hanaRem / 0.30);
-
-            let html = `
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-                    <div class="font-bold text-amber-300">현재 남은 한도 기준 최고 효율 결제액</div>
-                    <div class="space-y-1 text-slate-300">
-                        <div class="flex justify-between">
-                            <span>신한 20% 한도 완파 결제액:</span>
-                            <strong class="text-blue-300">${maxShinhanSpend.toLocaleString()}원</strong>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>하나 30% 한도 완파 결제액:</span>
-                            <strong class="text-emerald-300">${maxHanaSpend.toLocaleString()}원</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
-                    <div class="font-bold text-slate-200">추천 한도 영끌 액션</div>
-                    <p class="text-[11px] text-slate-400">
-                        현재 장바구니(${cartTotal.toLocaleString()}원)에서 약 <strong class="text-amber-300">${Math.max(0, 30000 - cartTotal).toLocaleString()}원</strong>을 더 추가하시면 20% 환급율의 최대 혜택 구간에 딱 맞게 결제할 수 있습니다.
-                    </p>
-                </div>
-            `;
-
-            content.innerHTML = html;
-            document.getElementById('limitMaximizerModal').classList.remove('hidden');
-        }
-
-        function closeLimitMaximizerModal() {
-            document.getElementById('limitMaximizerModal').classList.add('hidden');
-        }
-
-        // Execute Payment Completion Action
-        function executePaymentCompletion() {
-            const cartTotal = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            if (cartTotal === 0) {
-                alert("장바구니에 담긴 물품이 없습니다!");
-                return;
-            }
-
-            let memo = prompt("결제 완료 영수증에 기록할 메모를 입력하세요 (선택):", "PX 정기 이용 결제");
-            if (memo === null) return; // User cancelled
-
-            let estimatedRefund = 0;
-            let cardUsedStr = "";
-
-            if (state.isSplitPayment && cartTotal >= 30000 && state.userCards.shinhan.own) {
-                // Split deduction: Shinhan 30,000 KRW, Hana remainder
-                const step1Refund = Math.min(30000 * 0.20, state.userCards.shinhan.limit);
-                state.userCards.shinhan.limit -= step1Refund;
-
-                const remainder = cartTotal - 30000;
-                let step2Refund = 0;
-                if (remainder > 0 && state.userCards.hana.own) {
-                    step2Refund = Math.min(remainder * 0.30, state.userCards.hana.limit);
-                    state.userCards.hana.limit -= step2Refund;
-                }
-                estimatedRefund = step1Refund + step2Refund;
-                cardUsedStr = "신한(3만)+하나(잔액)";
-            } else {
-                // Single deduction (best single)
-                const refund = Math.min(cartTotal * (cartTotal >= 30000 ? 0.20 : 0.30), state.userCards.shinhan.limit);
-                state.userCards.shinhan.limit -= refund;
-                estimatedRefund = refund;
-                cardUsedStr = "신한카드 단일";
-            }
-
-            // Record in History
-            const now = new Date();
-            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            
-            // Expected refund date: 10th of next month
-            const nextMonth10th = new Date(now.getFullYear(), now.getMonth() + 1, 10);
-            const refundDateStr = `${nextMonth10th.getMonth()+1}월 10일`;
-
-            state.history.unshift({
-                id: Date.now(),
-                date: dateStr,
-                total: cartTotal,
-                refund: Math.round(estimatedRefund),
-                card: cardUsedStr,
-                memo: memo || "PX 물품 구매",
-                refundDate: refundDateStr
-            });
-
-            // Clear Cart after payment
-            state.cart = [];
-            renderAll();
-
-            alert(`🎉 결제가 완결 처리되었습니다!\n\n• 결제 금액: ${cartTotal.toLocaleString()}원\n• 예상 환급액: +${Math.round(estimatedRefund).toLocaleString()}원 (다음달 ${refundDateStr} 입금 예정)\n• 남은 카드 한도가 자동으로 차감 업데이트되었습니다.`);
-        }
-
-        // Open & Close Settings Modal
-        function openSettingsModal() {
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
-
-        // Open & Close Catalog Modal
-        function openCatalogModal() {
-            renderCatalogItems();
-            document.getElementById('catalogModal').classList.remove('hidden');
-        }
-        function closeCatalogModal() {
-            document.getElementById('catalogModal').classList.add('hidden');
-        }
-
-        // Category Filter for Catalog
-        function setCategoryFilter(cat) {
-            state.activeCategoryFilter = cat;
-            document.querySelectorAll('.cat-tab-btn').forEach(btn => {
-                btn.className = "cat-tab-btn font-bold px-2.5 py-1 rounded-lg text-slate-400 hover:text-white";
-            });
-            event.target.className = "cat-tab-btn active font-bold px-2.5 py-1 rounded-lg bg-emerald-600 text-white";
-            renderCatalogItems();
-        }
-
-        // Render Catalog Modal Items List
-        function renderCatalogItems() {
-            const container = document.getElementById('catalogItemsList');
-            const search = document.getElementById('catalogSearchInput').value.trim().toLowerCase();
-
-            let items = state.catalog.filter(i => {
-                const matchCat = (state.activeCategoryFilter === 'all' || i.category === state.activeCategoryFilter);
-                const matchSearch = (i.name.toLowerCase().includes(search));
-                return matchCat && matchSearch;
-            });
-
-            if (items.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">검색 조건에 일치하는 PX 품목이 없습니다.</div>`;
-                return;
-            }
-
-            let html = '';
-            items.forEach(item => {
-                html += `
-                    <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
-                        <div class="flex items-center space-x-2.5 min-w-0 flex-1 pr-2">
-                            <button onclick="toggleFavoriteCatalog(${item.id})" class="text-sm ${item.fav ? 'text-amber-400' : 'text-slate-600 hover:text-slate-400'}">
-                                <i class="fa-${item.fav ? 'solid' : 'regular'} fa-star"></i>
-                            </button>
-                            <div class="min-w-0 flex-1">
-                                <div class="font-bold text-slate-200 truncate">${item.name}</div>
-                                <div class="text-[10px] text-slate-400">${item.category} • <span class="text-emerald-400 font-semibold">${item.price.toLocaleString()}원</span></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-1.5">
-                            <button onclick="editCatalogPrice(${item.id})" class="text-slate-400 hover:text-amber-300 px-1.5 py-1 text-[11px]">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button onclick="deleteCatalogItem(${item.id})" class="text-slate-500 hover:text-rose-400 px-1.5 py-1 text-[11px]">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                            <button onclick="addToCart(${item.id})" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500/40 text-emerald-300 hover:text-white rounded-lg font-extrabold text-[11px] transition">
-                                + 담기
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // Toggle Star Favorite Status
-        function toggleFavoriteCatalog(id) {
-            const item = state.catalog.find(i => i.id === id);
-            if (item) {
-                item.fav = !item.fav;
-                renderAll();
-                renderCatalogItems();
-            }
-        }
-
-        // Edit Catalog Item Price
-        function editCatalogPrice(id) {
-            const item = state.catalog.find(i => i.id === id);
-            if (!item) return;
-            const newPrice = prompt(`[${item.name}] 수정할 PX 판매 가격(원)을 입력하세요:`, item.price);
-            if (newPrice !== null && !isNaN(newPrice) && parseInt(newPrice) > 0) {
-                item.price = parseInt(newPrice);
-                renderAll();
-                renderCatalogItems();
-            }
-        }
-
-        // Delete Catalog Item
-        function deleteCatalogItem(id) {
-            if (confirm("이 품목을 카탈로그에서 삭제하시겠습니까?")) {
-                state.catalog = state.catalog.filter(i => i.id !== id);
-                renderAll();
-                renderCatalogItems();
-            }
-        }
-
-        // Toggle Custom Item Form
-        function toggleCustomItemForm() {
-            const form = document.getElementById('customItemForm');
-            form.classList.toggle('hidden');
-        }
-
-        // Add Custom Catalog Item
-        function addCustomCatalogItem() {
-            const nameInput = document.getElementById('customName');
-            const priceInput = document.getElementById('customPrice');
-            const catInput = document.getElementById('customCategory');
-
-            const name = nameInput.value.trim();
-            const price = parseInt(priceInput.value);
-
-            if (!name || isNaN(price) || price <= 0) {
-                alert("올바른 품목명과 가격을 입력해 주세요!");
-                return;
-            }
-
-            const newItem = {
-                id: Date.now(),
-                name: name,
-                price: price,
-                category: catInput.value,
-                fav: true
-            };
-
-            state.catalog.unshift(newItem);
-            nameInput.value = '';
-            priceInput.value = '';
-            toggleCustomItemForm();
-            renderAll();
-            renderCatalogItems();
-        }
-
-        // Open History & Backup Modal
-        function openHistoryModal() {
-            renderHistoryUI();
-            document.getElementById('historyModal').classList.remove('hidden');
-        }
-
-        function closeHistoryModal() {
-            document.getElementById('historyModal').classList.add('hidden');
-        }
-
-        // Render History UI
-        function renderHistoryUI() {
-            const container = document.getElementById('paymentHistoryList');
-
-            if (state.history.length === 0) {
-                container.innerHTML = `<div class="text-center py-4 text-slate-500">완결 처리된 영수증 내역이 없습니다.</div>`;
-                return;
-            }
-
-            let html = '';
-            state.history.forEach(h => {
-                html += `
-                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1">
-                        <div class="flex justify-between font-bold text-slate-200">
-                            <span>${h.memo} (${h.card})</span>
-                            <span class="text-emerald-400">+${h.refund.toLocaleString()}원 환급</span>
-                        </div>
-                        <div class="flex justify-between text-[11px] text-slate-400">
-                            <span>${h.date}</span>
-                            <span>결제액: ${h.total.toLocaleString()}원 (입금: ${h.refundDate})</span>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // JSON Backup Export
-        function exportDataJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `px_cardmaster_backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
-        }
-
-        // JSON Backup Import
-        function importDataJSON(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                try {
-                    const importedState = JSON.parse(e.target.result);
-                    state = { ...state, ...importedState };
-                    renderAll();
-                    alert("데이터 복구가 성공적으로 완료되었습니다!");
-                    closeHistoryModal();
-                } catch(err) {
-                    alert("올바르지 않은 백업 파일 형식입니다.");
-                }
-            };
-            if (event.target.files[0]) {
-                fileReader.readAsText(event.target.files[0]);
-            }
-        }
-
-        // Reset All Data
-        function resetAllData() {
-            if (confirm("모든 한도 설정, 카탈로그, 결제 이력을 초기 상태로 리셋하시겠습니까?")) {
-                localStorage.removeItem('px_cardmaster_state_v2');
-                state.catalog = [...DEFAULT_CATALOG];
-                state.cart = [];
-                state.history = [];
-                state.userCards = {
-                    ibk: { own: true, salaryTransfer: true, over30kLimit: 50000, over30kCount: 2 },
-                    shinhan: { own: true, limit: 100000 },
-                    hana: { own: true, limit: 100000 }
-                };
-                renderAll();
-                closeHistoryModal();
-            }
-        }
-    </script>
+        state = parsed;
+        saveState();
+        renderAll();
+        showToast('데이터가 복원되었습니다.');
+      } catch {
+        showToast('올바른 JSON 형식이 아닙니다.');
+      }
+    });
+
+    document.getElementById('btnResetAll').addEventListener('click', () => {
+      if (!confirm('모든 데이터를 초기 상태로 되돌릴까요?')) return;
+      state = structuredClone(DEFAULT_STATE);
+      saveState();
+      renderAll();
+      showToast('초기화되었습니다.');
+    });
+
+    renderAll();
+  </script>
 </body>
 </html>
