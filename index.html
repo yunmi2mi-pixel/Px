@@ -23,6 +23,8 @@
       --purple-light: #f2edff;
       --teal: #00a8b5;
       --teal-light: #e3f8fa;
+      --pink: #ec4899;
+      --pink-light: #fce7f3;
       --radius: 16px;
     }
 
@@ -224,6 +226,10 @@
 
     .remain-tag.negative {
       color: var(--danger);
+    }
+
+    .remain-tag.neutral {
+      color: var(--sub);
     }
 
     input[type="text"],
@@ -501,6 +507,7 @@
     .cal-bar.leave { background: var(--success); }
     .cal-bar.pass { background: var(--warning); }
     .cal-bar.combat { background: var(--teal); }
+    .cal-bar.visit { background: var(--pink); }
     .cal-bar.discharge { background: var(--danger); }
 
     /* Quick Picker Box inside Calendar */
@@ -564,6 +571,7 @@
     .quick-type-btn.leave { background: var(--success); }
     .quick-type-btn.pass { background: var(--warning); }
     .quick-type-btn.combat { background: var(--teal); }
+    .quick-type-btn.visit { background: var(--pink); grid-column: span 2; }
 
     /* Schedule List */
     .plan-item {
@@ -617,6 +625,7 @@
     .badge-leave { background: var(--success-light); color: var(--success); }
     .badge-pass { background: var(--warning-light); color: var(--warning); }
     .badge-combat { background: var(--teal-light); color: var(--teal); }
+    .badge-visit { background: var(--pink-light); color: var(--pink); }
     .badge-discharge { background: var(--danger-light); color: var(--danger); }
     .badge-tbd { background: var(--purple-light); color: var(--purple); }
 
@@ -792,7 +801,7 @@
       <div class="card">
         <div class="card-title">
           <span>휴가 현황 요약</span>
-          <span class="card-sub">종류별 잔여 자동 계산</span>
+          <span class="card-sub">전휴 미포함 · 종류별 잔여 계산</span>
         </div>
         <div class="stats-grid">
           <div class="stat-box">
@@ -832,18 +841,18 @@
             <input type="number" id="inOther" min="0" value="0" />
           </div>
           <div class="field">
-            <label for="inJeonhyu">
-              <span>전휴 (일)</span>
-              <span class="remain-tag" id="remJeonhyu">잔여 0일</span>
-            </label>
-            <input type="number" id="inJeonhyu" min="0" value="0" />
-          </div>
-          <div class="field" style="grid-column: span 2;">
             <label for="inExpected">
               <span>추가 예정 휴가 (일)</span>
               <span class="remain-tag" id="remExpected">잔여 0일</span>
             </label>
             <input type="number" id="inExpected" min="0" value="0" />
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="inJeonhyu">
+              <span>전휴 (일) · 휴가 합계 미포함</span>
+              <span class="remain-tag neutral" id="remJeonhyu">별도 관리</span>
+            </label>
+            <input type="number" id="inJeonhyu" min="0" value="0" />
           </div>
         </div>
       </div>
@@ -867,6 +876,7 @@
           <span class="legend-item"><i class="legend-dot" style="background: var(--success);"></i>중간휴가</span>
           <span class="legend-item"><i class="legend-dot" style="background: var(--warning);"></i>외박/외출</span>
           <span class="legend-item"><i class="legend-dot" style="background: var(--teal);"></i>전투휴무</span>
+          <span class="legend-item"><i class="legend-dot" style="background: var(--pink);"></i>면회</span>
           <span class="legend-item"><i class="legend-dot" style="background: var(--danger);"></i>전역·공휴일</span>
         </div>
 
@@ -890,6 +900,7 @@
             <button class="quick-type-btn leave" data-quick-type="중간휴가">중간휴가</button>
             <button class="quick-type-btn pass" data-quick-type="외박/외출">외박/외출</button>
             <button class="quick-type-btn combat" data-quick-type="전투휴무">전투휴무</button>
+            <button class="quick-type-btn visit" data-quick-type="면회">면회</button>
           </div>
         </div>
       </div>
@@ -922,6 +933,7 @@
               <option value="말출">말출 (말년휴가)</option>
               <option value="외박/외출">외박/외출</option>
               <option value="전투휴무">전투휴무</option>
+              <option value="면회">면회</option>
             </select>
           </div>
         </div>
@@ -955,7 +967,7 @@
 
         <label class="checkbox-row">
           <input type="checkbox" id="planNoDeduct" />
-          <span>휴가 일수 차감 안 함 (외박·전투휴무 등)</span>
+          <span>휴가 일수 차감 안 함 (외박·전투휴무·면회 등)</span>
         </label>
 
         <div class="breakdown-box" id="breakdownBox">
@@ -963,7 +975,7 @@
             <span>휴가 종류별 차감 (일)</span>
             <span class="breakdown-status" id="breakdownStatus">일정 0일 / 배분 0일</span>
           </div>
-          <div class="grid-3">
+          <div class="grid-2">
             <div class="field">
               <label for="bdAnnual">연가</label>
               <input type="number" id="bdAnnual" min="0" value="0" />
@@ -975,10 +987,6 @@
             <div class="field">
               <label for="bdOther">위로·보상</label>
               <input type="number" id="bdOther" min="0" value="0" />
-            </div>
-            <div class="field">
-              <label for="bdJeonhyu">전휴</label>
-              <input type="number" id="bdJeonhyu" min="0" value="0" />
             </div>
             <div class="field">
               <label for="bdExpected">추가예정</label>
@@ -1084,12 +1092,12 @@
   <script>
     const STORAGE_KEY = 'roka_leave_planner_v1';
 
-    const LEAVE_KEYS = ['annual', 'reward', 'other', 'jeonhyu', 'expected'];
+    // 휴가 합계에 포함되는 키 (전휴 제외)
+    const LEAVE_KEYS = ['annual', 'reward', 'other', 'expected'];
     const LEAVE_LABELS = {
       annual: '연가',
       reward: '포상',
       other: '위로·보상',
-      jeonhyu: '전휴',
       expected: '추가예정'
     };
 
@@ -1124,6 +1132,7 @@
       '2027-05-05': '어린이날',
       '2027-05-13': '부처님오신날',
       '2027-06-06': '현충일',
+      '2027-07-19': '휴일',
       '2027-08-15': '광복절',
       '2027-08-16': '대체휴일',
       '2027-09-14': '추석연휴',
@@ -1156,7 +1165,7 @@
           start: '2026-12-19',
           end: '2026-12-20',
           noDeduct: true,
-          deductBreakdown: { annual: 0, reward: 0, other: 0, jeonhyu: 0, expected: 0 },
+          deductBreakdown: { annual: 0, reward: 0, other: 0, expected: 0 },
           memo: '가족 모임 / 부대 인근 숙소'
         },
         {
@@ -1167,7 +1176,7 @@
           month: '2027-01',
           days: 4,
           noDeduct: false,
-          deductBreakdown: { annual: 4, reward: 0, other: 0, jeonhyu: 0, expected: 0 },
+          deductBreakdown: { annual: 4, reward: 0, other: 0, expected: 0 },
           memo: '3박 4일 비발디파크 예정 (날짜 추후 확정)'
         },
         {
@@ -1178,7 +1187,7 @@
           start: '2027-03-11',
           end: '2027-03-17',
           noDeduct: false,
-          deductBreakdown: { annual: 5, reward: 2, other: 0, jeonhyu: 0, expected: 0 },
+          deductBreakdown: { annual: 5, reward: 2, other: 0, expected: 0 },
           memo: '국외여행 허가 출국 1~2개월 전 신청 필수 / 김해공항 출국'
         }
       ],
@@ -1199,8 +1208,8 @@
     const nowInit = new Date();
     let calYear = nowInit.getFullYear();
     let calMonth = nowInit.getMonth();
-    let rangeStart = null; // 'YYYY-MM-DD'
-    let rangeEnd = null;   // 'YYYY-MM-DD'
+    let rangeStart = null;
+    let rangeEnd = null;
 
     function loadState() {
       try {
@@ -1278,7 +1287,7 @@
     }
 
     function getPlanBreakdown(p) {
-      const empty = { annual: 0, reward: 0, other: 0, jeonhyu: 0, expected: 0 };
+      const empty = { annual: 0, reward: 0, other: 0, expected: 0 };
       if (p.noDeduct) return empty;
       if (p.deductBreakdown) {
         const sum = LEAVE_KEYS.reduce((acc, k) => acc + Number(p.deductBreakdown[k] || 0), 0);
@@ -1287,7 +1296,6 @@
             annual: Number(p.deductBreakdown.annual || 0),
             reward: Number(p.deductBreakdown.reward || 0),
             other: Number(p.deductBreakdown.other || 0),
-            jeonhyu: Number(p.deductBreakdown.jeonhyu || 0),
             expected: Number(p.deductBreakdown.expected || 0)
           };
         }
@@ -1315,9 +1323,9 @@
         .replaceAll('"', '&quot;');
     }
 
-    // Leave Summary Calculation
+    // Leave Summary Calculation (전휴 제외)
     function getLeaveSummary() {
-      const usedByType = { annual: 0, reward: 0, other: 0, jeonhyu: 0, expected: 0 };
+      const usedByType = { annual: 0, reward: 0, other: 0, expected: 0 };
       let pastUsed = 0;
       const todayStr = formatDate(new Date());
 
@@ -1393,7 +1401,6 @@
         annual: 'remAnnual',
         reward: 'remReward',
         other: 'remOther',
-        jeonhyu: 'remJeonhyu',
         expected: 'remExpected'
       };
       LEAVE_KEYS.forEach(k => {
@@ -1409,6 +1416,7 @@
       if (type === '말출') return 'malchul';
       if (type === '외박/외출') return 'pass';
       if (type === '전투휴무') return 'combat';
+      if (type === '면회') return 'visit';
       return 'leave';
     }
 
@@ -1416,7 +1424,12 @@
       if (type === '말출') return 'badge-malchul';
       if (type === '외박/외출') return 'badge-pass';
       if (type === '전투휴무') return 'badge-combat';
+      if (type === '면회') return 'badge-visit';
       return 'badge-leave';
+    }
+
+    function isAutoNoDeductType(type) {
+      return type === '외박/외출' || type === '전투휴무' || type === '면회';
     }
 
     function renderQuickPicker() {
@@ -1692,7 +1705,6 @@
         annual: Math.max(0, Number(document.getElementById('bdAnnual').value || 0)),
         reward: Math.max(0, Number(document.getElementById('bdReward').value || 0)),
         other: Math.max(0, Number(document.getElementById('bdOther').value || 0)),
-        jeonhyu: Math.max(0, Number(document.getElementById('bdJeonhyu').value || 0)),
         expected: Math.max(0, Number(document.getElementById('bdExpected').value || 0))
       };
     }
@@ -1733,7 +1745,6 @@
         document.getElementById('bdAnnual').value = bd.annual;
         document.getElementById('bdReward').value = bd.reward;
         document.getElementById('bdOther').value = bd.other;
-        document.getElementById('bdJeonhyu').value = bd.jeonhyu;
         document.getElementById('bdExpected').value = bd.expected;
         updateBreakdownStatus();
 
@@ -1790,11 +1801,9 @@
       const dateStr = cell.dataset.date;
 
       if (!rangeStart || (rangeStart && rangeEnd)) {
-        // 새 범위 시작
         rangeStart = dateStr;
         rangeEnd = null;
       } else {
-        // 종료일 선택 (역순 클릭 시 자동 정렬)
         if (dateStr < rangeStart) {
           rangeEnd = rangeStart;
           rangeStart = dateStr;
@@ -1823,7 +1832,7 @@
       const days = calcInclusiveDays(start, end);
       const customTitle = document.getElementById('quickTitleInput').value.trim();
       const title = customTitle || type;
-      const noDeduct = type === '외박/외출' || type === '전투휴무';
+      const noDeduct = isAutoNoDeductType(type);
 
       state.plans.push({
         id: 'p_' + Date.now(),
@@ -1836,8 +1845,8 @@
         days: 0,
         noDeduct,
         deductBreakdown: noDeduct
-          ? { annual: 0, reward: 0, other: 0, jeonhyu: 0, expected: 0 }
-          : { annual: days, reward: 0, other: 0, jeonhyu: 0, expected: 0 },
+          ? { annual: 0, reward: 0, other: 0, expected: 0 }
+          : { annual: days, reward: 0, other: 0, expected: 0 },
         memo: ''
       });
 
@@ -1880,9 +1889,9 @@
 
     // Event Listeners: Plan Form
     document.getElementById('planType').addEventListener('change', (e) => {
-      const isNoDeductType = e.target.value === '외박/외출' || e.target.value === '전투휴무';
-      document.getElementById('planNoDeduct').checked = isNoDeductType;
-      toggleBreakdownUI(isNoDeductType);
+      const noDeduct = isAutoNoDeductType(e.target.value);
+      document.getElementById('planNoDeduct').checked = noDeduct;
+      toggleBreakdownUI(noDeduct);
     });
 
     document.getElementById('planIsTbd').addEventListener('change', (e) => {
@@ -1893,7 +1902,7 @@
       toggleBreakdownUI(e.target.checked);
     });
 
-    ['planStart', 'planEnd', 'planTbdDays', 'bdAnnual', 'bdReward', 'bdOther', 'bdJeonhyu', 'bdExpected'].forEach(id => {
+    ['planStart', 'planEnd', 'planTbdDays', 'bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateBreakdownStatus);
     });
 
@@ -1909,7 +1918,7 @@
       document.getElementById('planTbdDays').value = '4';
       document.getElementById('planNoDeduct').checked = false;
       toggleBreakdownUI(false);
-      ['bdAnnual', 'bdReward', 'bdOther', 'bdJeonhyu', 'bdExpected'].forEach(id => {
+      ['bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
         document.getElementById(id).value = '0';
       });
       updateBreakdownStatus();
@@ -1967,12 +1976,12 @@
       }
 
       if (noDeduct) {
-        planData.deductBreakdown = { annual: 0, reward: 0, other: 0, jeonhyu: 0, expected: 0 };
+        planData.deductBreakdown = { annual: 0, reward: 0, other: 0, expected: 0 };
       } else {
         const bd = getFormBreakdownValues();
         const bdSum = LEAVE_KEYS.reduce((acc, k) => acc + bd[k], 0);
         if (bdSum === 0) {
-          planData.deductBreakdown = { annual: totalPlanDays, reward: 0, other: 0, jeonhyu: 0, expected: 0 };
+          planData.deductBreakdown = { annual: totalPlanDays, reward: 0, other: 0, expected: 0 };
         } else if (bdSum !== totalPlanDays) {
           showToast(`배분 합계(${bdSum}일)와 일정 일수(${totalPlanDays}일)가 다릅니다.`);
           return;
