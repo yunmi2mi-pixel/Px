@@ -19,6 +19,8 @@
       --success-light: #e6f8f2;
       --warning: #ff9800;
       --warning-light: #fff4e5;
+      --purple: #7c4dff;
+      --purple-light: #f2edff;
       --radius: 16px;
     }
 
@@ -191,6 +193,7 @@
     input[type="text"],
     input[type="number"],
     input[type="date"],
+    input[type="month"],
     select,
     textarea {
       width: 100%;
@@ -214,7 +217,7 @@
       gap: 8px;
       font-size: 13px;
       color: var(--text);
-      margin: 8px 0 12px;
+      margin: 6px 0 10px;
       cursor: pointer;
     }
 
@@ -246,26 +249,6 @@
     .btn-danger-soft { background: var(--danger-light); color: var(--danger); }
     .btn-gray { background: var(--bg); color: var(--text); }
     .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
-
-    /* Malchul Box */
-    .malchul-result {
-      background: var(--primary-light);
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 10px;
-    }
-
-    .malchul-date {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 4px 0;
-    }
-
-    .malchul-desc {
-      font-size: 12px;
-      color: #335c99;
-    }
 
     /* Calendar Styles */
     .cal-header {
@@ -308,6 +291,37 @@
       display: inline-block;
     }
 
+    .cal-tbd-banner {
+      background: var(--purple-light);
+      border: 1px solid #d9c8ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    .cal-tbd-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--purple);
+      margin-bottom: 6px;
+    }
+
+    .cal-tbd-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tbd-chip {
+      background: #fff;
+      color: var(--purple);
+      border: 1px solid #d9c8ff;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .cal-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -328,9 +342,9 @@
     }
 
     .cal-cell {
-      min-height: 62px;
+      min-height: 68px;
       border-radius: 10px;
-      padding: 4px 3px;
+      padding: 4px 2px;
       background: #fff;
       border: 1px solid var(--border);
       display: flex;
@@ -360,25 +374,43 @@
     .cal-day-num {
       font-size: 12px;
       font-weight: 700;
-      margin-bottom: 3px;
       line-height: 1.2;
     }
 
-    .cal-cell.sun .cal-day-num { color: var(--danger); }
-    .cal-cell.sat .cal-day-num { color: var(--primary); }
+    .cal-cell.sun .cal-day-num,
+    .cal-cell.holiday .cal-day-num {
+      color: var(--danger);
+    }
+
+    .cal-cell.sat:not(.holiday) .cal-day-num {
+      color: var(--primary);
+    }
+
+    .cal-holiday-name {
+      font-size: 9px;
+      color: var(--danger);
+      font-weight: 600;
+      line-height: 1.2;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
 
     .cal-bars {
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 2px;
+      margin-top: 2px;
     }
 
     .cal-bar {
       width: 100%;
       font-size: 10px;
       font-weight: 700;
-      padding: 1px 3px;
+      padding: 1px 2px;
       border-radius: 4px;
       white-space: nowrap;
       overflow: hidden;
@@ -407,6 +439,12 @@
       background: #f8fbff;
     }
 
+    .plan-item.is-tbd {
+      border-style: dashed;
+      border-color: var(--purple);
+      background: #fcfaff;
+    }
+
     .plan-top {
       display: flex;
       justify-content: space-between;
@@ -418,6 +456,12 @@
     .plan-title {
       font-size: 15px;
       font-weight: 700;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
     .badge {
@@ -433,6 +477,7 @@
     .badge-leave { background: var(--success-light); color: var(--success); }
     .badge-pass { background: var(--warning-light); color: var(--warning); }
     .badge-discharge { background: var(--danger-light); color: var(--danger); }
+    .badge-tbd { background: var(--purple-light); color: var(--purple); }
 
     .plan-meta {
       font-size: 13px;
@@ -626,38 +671,14 @@
             <input type="number" id="inOther" min="0" value="0" />
           </div>
           <div class="field">
+            <label for="inJeonhyu">전휴 (일)</label>
+            <input type="number" id="inJeonhyu" min="0" value="0" />
+          </div>
+          <div class="field" style="grid-column: span 2;">
             <label for="inExpected">추가 예정 휴가 (일)</label>
             <input type="number" id="inExpected" min="0" value="0" />
           </div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <span>말출 출발일 역산기</span>
-          <button class="btn btn-soft btn-sm" id="btnApplyRemainToMalchul">잔여일수 적용</button>
-        </div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="malchulDays">말출 사용 일수 (일)</label>
-            <input type="number" id="malchulDays" min="1" value="15" />
-          </div>
-          <div class="field">
-            <label for="malchulType">복귀 방식</label>
-            <select id="malchulType">
-              <option value="no-return">미복귀 전역 (전역일 종료)</option>
-              <option value="return-before">전역 전날 복귀</option>
-            </select>
-          </div>
-        </div>
-        <div class="malchul-result">
-          <div class="card-sub">예상 말출 출발일</div>
-          <div class="malchul-date" id="malchulStartOut">-</div>
-          <div class="malchul-desc" id="malchulDescOut">-</div>
-        </div>
-        <button class="btn btn-primary" id="btnAddMalchulPlan" style="margin-top: 12px;">
-          이 일정으로 말출 등록하기
-        </button>
       </div>
     </section>
 
@@ -678,8 +699,10 @@
           <span class="legend-item"><i class="legend-dot" style="background: var(--primary);"></i>말출</span>
           <span class="legend-item"><i class="legend-dot" style="background: var(--success);"></i>중간휴가</span>
           <span class="legend-item"><i class="legend-dot" style="background: var(--warning);"></i>외박/외출</span>
-          <span class="legend-item"><i class="legend-dot" style="background: var(--danger);"></i>전역일</span>
+          <span class="legend-item"><i class="legend-dot" style="background: var(--danger);"></i>전역일·공휴일</span>
         </div>
+
+        <div id="calTbdBanner" class="cal-tbd-banner" style="display:none;"></div>
 
         <div class="cal-weekdays">
           <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
@@ -718,7 +741,14 @@
             </select>
           </div>
         </div>
-        <div class="grid-2">
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="planIsTbd" />
+          <span>날짜 미정 (월만 확정됨)</span>
+        </label>
+
+        <!-- 확정 날짜 입력 영역 -->
+        <div class="grid-2" id="exactDateFields">
           <div class="field">
             <label for="planStart">시작일</label>
             <input type="date" id="planStart" />
@@ -728,10 +758,24 @@
             <input type="date" id="planEnd" />
           </div>
         </div>
+
+        <!-- 월만 확정 입력 영역 -->
+        <div class="grid-2" id="tbdDateFields" style="display:none;">
+          <div class="field">
+            <label for="planMonth">예정 월</label>
+            <input type="month" id="planMonth" />
+          </div>
+          <div class="field">
+            <label for="planTbdDays">사용 일수 (일)</label>
+            <input type="number" id="planTbdDays" min="1" value="4" />
+          </div>
+        </div>
+
         <label class="checkbox-row">
           <input type="checkbox" id="planNoDeduct" />
           <span>휴가 일수 차감 안 함 (외박·외출 등)</span>
         </label>
+
         <div class="field">
           <label for="planMemo">메모 (교통, 예약, 목표 등)</label>
           <textarea id="planMemo" rows="2" placeholder="예: KTX 6호차 창가 예매, 국외여행 허가 신청"></textarea>
@@ -829,6 +873,52 @@
   <script>
     const STORAGE_KEY = 'roka_leave_planner_v1';
 
+    // 2026~2027 대한민국 법정공휴일 및 대체공휴일
+    const KR_HOLIDAYS = {
+      // 2026년
+      '2026-01-01': '신정',
+      '2026-02-16': '설연휴',
+      '2026-02-17': '설날',
+      '2026-02-18': '설연휴',
+      '2026-03-01': '삼일절',
+      '2026-03-02': '대체휴일',
+      '2026-05-05': '어린이날',
+      '2026-05-24': '부처님오신날',
+      '2026-05-25': '대체휴일',
+      '2026-06-03': '지방선거',
+      '2026-06-06': '현충일',
+      '2026-08-15': '광복절',
+      '2026-08-17': '대체휴일',
+      '2026-09-24': '추석연휴',
+      '2026-09-25': '추석',
+      '2026-09-26': '추석연휴',
+      '2026-10-03': '개천절',
+      '2026-10-05': '대체휴일',
+      '2026-10-09': '한글날',
+      '2026-12-25': '성탄절',
+      // 2027년
+      '2027-01-01': '신정',
+      '2027-02-06': '설연휴',
+      '2027-02-07': '설날',
+      '2027-02-08': '설연휴',
+      '2027-02-09': '대체휴일',
+      '2027-03-01': '삼일절',
+      '2027-05-05': '어린이날',
+      '2027-05-13': '부처님오신날',
+      '2027-06-06': '현충일',
+      '2027-08-15': '광복절',
+      '2027-08-16': '대체휴일',
+      '2027-09-14': '추석연휴',
+      '2027-09-15': '추석',
+      '2027-09-16': '추석연휴',
+      '2027-10-03': '개천절',
+      '2027-10-04': '대체휴일',
+      '2027-10-09': '한글날',
+      '2027-10-11': '대체휴일',
+      '2027-12-25': '성탄절',
+      '2027-12-27': '대체휴일'
+    };
+
     const DEFAULT_STATE = {
       enlistDate: '2026-01-26',
       dischargeDate: '2027-07-25',
@@ -836,17 +926,15 @@
         annual: 15,
         reward: 10,
         other: 0,
+        jeonhyu: 0,
         expected: 5
-      },
-      malchulCalc: {
-        days: 15,
-        type: 'no-return'
       },
       plans: [
         {
           id: 'p1',
           title: '12월 연말 외박',
           type: '외박/외출',
+          isTbd: false,
           start: '2026-12-19',
           end: '2026-12-20',
           noDeduct: true,
@@ -856,15 +944,17 @@
           id: 'p2',
           title: '1월 스키장 여행',
           type: '중간휴가',
-          start: '2027-01-14',
-          end: '2027-01-17',
+          isTbd: true,
+          month: '2027-01',
+          days: 4,
           noDeduct: false,
-          memo: '3박 4일 비발디파크 리프트권 및 장비 예약'
+          memo: '3박 4일 비발디파크 예정 (날짜 추후 확정)'
         },
         {
           id: 'p3',
           title: '3월 후쿠오카 여행',
           type: '중간휴가',
+          isTbd: false,
           start: '2027-03-11',
           end: '2027-03-17',
           noDeduct: false,
@@ -887,8 +977,8 @@
     // Calendar UI State
     const nowInit = new Date();
     let calYear = nowInit.getFullYear();
-    let calMonth = nowInit.getMonth(); // 0-11
-    let selectedCalDate = null; // 'YYYY-MM-DD' or null
+    let calMonth = nowInit.getMonth();
+    let selectedCalDate = null;
 
     function loadState() {
       try {
@@ -898,8 +988,7 @@
         return {
           ...structuredClone(DEFAULT_STATE),
           ...parsed,
-          leavePool: { ...DEFAULT_STATE.leavePool, ...(parsed.leavePool || {}) },
-          malchulCalc: { ...DEFAULT_STATE.malchulCalc, ...(parsed.malchulCalc || {}) }
+          leavePool: { ...DEFAULT_STATE.leavePool, ...(parsed.leavePool || {}) }
         };
       } catch {
         return structuredClone(DEFAULT_STATE);
@@ -948,6 +1037,12 @@
       return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]})`;
     }
 
+    function formatKoreanMonth(monthStr) {
+      if (!monthStr) return '-';
+      const [y, m] = monthStr.split('-');
+      return `${y}년 ${Number(m)}월 중`;
+    }
+
     function calcInclusiveDays(startStr, endStr) {
       const s = parseDate(startStr);
       const e = parseDate(endStr);
@@ -955,10 +1050,14 @@
       return Math.round((e - s) / 86400000) + 1;
     }
 
-    function addDays(date, offset) {
-      const copy = new Date(date.getTime());
-      copy.setDate(copy.getDate() + offset);
-      return copy;
+    function getPlanDays(p) {
+      if (p.isTbd) return Math.max(0, Number(p.days || 0));
+      return calcInclusiveDays(p.start, p.end);
+    }
+
+    function getPlanSortKey(p) {
+      if (p.isTbd) return `${p.month || '9999-99'}-00`;
+      return p.start || '9999-99-99';
     }
 
     function escapeHtml(str) {
@@ -990,22 +1089,28 @@
       document.getElementById('heroServedText').textContent = `복무 ${servedDays}일 / 전체 ${totalDays}일`;
     }
 
-    // Render Dashboard & Malchul Calculator
+    // Render Dashboard
     function getLeaveSummary() {
-      const { annual, reward, other, expected } = state.leavePool;
-      const total = Number(annual || 0) + Number(reward || 0) + Number(other || 0) + Number(expected || 0);
+      const { annual, reward, other, jeonhyu, expected } = state.leavePool;
+      const total =
+        Number(annual || 0) +
+        Number(reward || 0) +
+        Number(other || 0) +
+        Number(jeonhyu || 0) +
+        Number(expected || 0);
       const used = state.plans.reduce((sum, p) => {
         if (p.noDeduct) return sum;
-        return sum + calcInclusiveDays(p.start, p.end);
+        return sum + getPlanDays(p);
       }, 0);
       return { total, used, remain: total - used };
     }
 
     function renderDashboard() {
-      const { annual, reward, other, expected } = state.leavePool;
+      const { annual, reward, other, jeonhyu, expected } = state.leavePool;
       document.getElementById('inAnnual').value = annual;
       document.getElementById('inReward').value = reward;
       document.getElementById('inOther').value = other;
+      document.getElementById('inJeonhyu').value = jeonhyu;
       document.getElementById('inExpected').value = expected;
 
       const { total, used, remain } = getLeaveSummary();
@@ -1014,27 +1119,6 @@
       const remainEl = document.getElementById('statRemain');
       remainEl.textContent = `${remain}일`;
       remainEl.className = `stat-val ${remain < 0 ? 'danger' : 'success'}`;
-
-      document.getElementById('malchulDays').value = state.malchulCalc.days;
-      document.getElementById('malchulType').value = state.malchulCalc.type;
-      renderMalchulPreview();
-    }
-
-    function getMalchulRange() {
-      const days = Math.max(1, Number(state.malchulCalc.days || 1));
-      const discharge = parseDate(state.dischargeDate);
-      const isNoReturn = state.malchulCalc.type === 'no-return';
-      const endDate = isNoReturn ? discharge : addDays(discharge, -1);
-      const startDate = addDays(endDate, -(days - 1));
-      return { startStr: formatDate(startDate), endStr: formatDate(endDate), days, isNoReturn };
-    }
-
-    function renderMalchulPreview() {
-      const { startStr, endStr, days, isNoReturn } = getMalchulRange();
-      const nights = days - 1;
-      document.getElementById('malchulStartOut').textContent = formatKoreanDate(startStr);
-      document.getElementById('malchulDescOut').textContent =
-        `${nights}박 ${days}일 (${formatKoreanDate(startStr)} ~ ${formatKoreanDate(endStr)}) · ${isNoReturn ? '미복귀 전역' : '전역 전날 복귀'}`;
     }
 
     // Render Calendar
@@ -1046,6 +1130,23 @@
 
     function renderCalendar() {
       document.getElementById('calMonthTitle').textContent = `${calYear}년 ${calMonth + 1}월`;
+      const currentMonthKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
+
+      // 월만 확정된(날짜 미정) 일정 배너
+      const tbdBanner = document.getElementById('calTbdBanner');
+      const monthTbdPlans = state.plans.filter(p => p.isTbd && p.month === currentMonthKey);
+      if (monthTbdPlans.length > 0) {
+        tbdBanner.style.display = 'block';
+        tbdBanner.innerHTML = `
+          <div class="cal-tbd-title">📌 이번 달 날짜 미정 일정 (${monthTbdPlans.length}건)</div>
+          <div class="cal-tbd-chips">
+            ${monthTbdPlans.map(p => `<span class="tbd-chip">${escapeHtml(p.title)} (${getPlanDays(p)}일)</span>`).join('')}
+          </div>
+        `;
+      } else {
+        tbdBanner.style.display = 'none';
+      }
+
       const grid = document.getElementById('calGrid');
       const firstDay = new Date(calYear, calMonth, 1).getDay();
       const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -1063,25 +1164,28 @@
         const isToday = dateStr === todayStr;
         const isSelected = dateStr === selectedCalDate;
         const isDischarge = dateStr === state.dischargeDate;
+        const holidayName = KR_HOLIDAYS[dateStr] || '';
 
-        const dayPlans = state.plans.filter(p => p.start <= dateStr && dateStr <= p.end);
+        const dayPlans = state.plans.filter(p => !p.isTbd && p.start <= dateStr && dateStr <= p.end);
 
         let barsHtml = '';
         if (isDischarge) {
           barsHtml += `<div class="cal-bar discharge">전역</div>`;
         }
-        dayPlans.slice(0, isDischarge ? 1 : 2).forEach(p => {
+        const maxBars = isDischarge ? 1 : 2;
+        dayPlans.slice(0, maxBars).forEach(p => {
           const shortTitle = p.title.length > 5 ? p.title.slice(0, 5) : p.title;
           barsHtml += `<div class="cal-bar ${getPlanBarClass(p.type)}">${escapeHtml(shortTitle)}</div>`;
         });
-        if (dayPlans.length > (isDischarge ? 1 : 2)) {
-          barsHtml += `<div class="cal-bar" style="background:#8b95a1;">+${dayPlans.length - (isDischarge ? 1 : 2)}</div>`;
+        if (dayPlans.length > maxBars) {
+          barsHtml += `<div class="cal-bar" style="background:#8b95a1;">+${dayPlans.length - maxBars}</div>`;
         }
 
         const classes = [
           'cal-cell',
           dow === 0 ? 'sun' : '',
           dow === 6 ? 'sat' : '',
+          holidayName ? 'holiday' : '',
           isToday ? 'today' : '',
           isSelected ? 'selected' : ''
         ].filter(Boolean).join(' ');
@@ -1089,6 +1193,7 @@
         html += `
           <div class="${classes}" data-date="${dateStr}">
             <div class="cal-day-num">${d}</div>
+            ${holidayName ? `<div class="cal-holiday-name">${holidayName}</div>` : ''}
             <div class="cal-bars">${barsHtml}</div>
           </div>
         `;
@@ -1098,6 +1203,38 @@
       renderCalendarDetails();
     }
 
+    function renderPlanCardHtml(p, showActions = false) {
+      const days = getPlanDays(p);
+      const nights = Math.max(0, days - 1);
+      const isMalchul = p.type === '말출';
+      const badgeClass = isMalchul ? 'badge-malchul' : (p.type === '외박/외출' ? 'badge-pass' : 'badge-leave');
+      const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
+
+      const dateText = p.isTbd
+        ? `${formatKoreanMonth(p.month)} (날짜 미정) · <strong>${nights}박 ${days}일</strong> (${deductText})`
+        : `${formatKoreanDate(p.start)} ~ ${formatKoreanDate(p.end)} · <strong>${nights}박 ${days}일</strong> (${deductText})`;
+
+      return `
+        <div class="plan-item ${isMalchul ? 'is-malchul' : ''} ${p.isTbd ? 'is-tbd' : ''}" data-id="${p.id}">
+          <div class="plan-top">
+            <div class="plan-title">${escapeHtml(p.title)}</div>
+            <div class="badge-group">
+              ${p.isTbd ? `<span class="badge badge-tbd">날짜미정</span>` : ''}
+              <span class="badge ${badgeClass}">${p.type}</span>
+            </div>
+          </div>
+          <div class="plan-meta">${dateText}</div>
+          ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
+          ${showActions ? `
+            <div class="plan-actions">
+              <button class="btn btn-gray btn-sm" data-action="edit" data-id="${p.id}">수정</button>
+              <button class="btn btn-danger-soft btn-sm" data-action="delete" data-id="${p.id}">삭제</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
     function renderCalendarDetails() {
       const heading = document.getElementById('calDetailHeading');
       const quickBtn = document.getElementById('btnQuickAddFromCal');
@@ -1105,20 +1242,23 @@
 
       let targetPlans = [];
       let showDischargeCard = false;
+      let holidayText = '';
 
       if (selectedCalDate) {
-        heading.textContent = `${formatKoreanDate(selectedCalDate)} 일정`;
+        holidayText = KR_HOLIDAYS[selectedCalDate] || '';
+        heading.textContent = `${formatKoreanDate(selectedCalDate)}${holidayText ? ` · ${holidayText}` : ''}`;
         quickBtn.style.display = 'inline-flex';
-        targetPlans = state.plans.filter(p => p.start <= selectedCalDate && selectedCalDate <= p.end);
+        targetPlans = state.plans.filter(p => !p.isTbd && p.start <= selectedCalDate && selectedCalDate <= p.end);
         showDischargeCard = selectedCalDate === state.dischargeDate;
       } else {
         heading.textContent = `${calYear}년 ${calMonth + 1}월 전체 일정`;
         quickBtn.style.display = 'none';
+        const currentMonthKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
         const monthStart = formatDate(new Date(calYear, calMonth, 1));
         const monthEnd = formatDate(new Date(calYear, calMonth + 1, 0));
         targetPlans = state.plans
-          .filter(p => p.start <= monthEnd && p.end >= monthStart)
-          .sort((a, b) => a.start.localeCompare(b.start));
+          .filter(p => (p.isTbd ? p.month === currentMonthKey : (p.start <= monthEnd && p.end >= monthStart)))
+          .sort((a, b) => getPlanSortKey(a).localeCompare(getPlanSortKey(b)));
         showDischargeCard = state.dischargeDate >= monthStart && state.dischargeDate <= monthEnd;
       }
 
@@ -1135,25 +1275,7 @@
         `;
       }
 
-      html += targetPlans.map(p => {
-        const days = calcInclusiveDays(p.start, p.end);
-        const nights = Math.max(0, days - 1);
-        const isMalchul = p.type === '말출';
-        const badgeClass = isMalchul ? 'badge-malchul' : (p.type === '외박/외출' ? 'badge-pass' : 'badge-leave');
-        const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
-        return `
-          <div class="plan-item ${isMalchul ? 'is-malchul' : ''}">
-            <div class="plan-top">
-              <div class="plan-title">${escapeHtml(p.title)}</div>
-              <span class="badge ${badgeClass}">${p.type}</span>
-            </div>
-            <div class="plan-meta">
-              ${formatKoreanDate(p.start)} ~ ${formatKoreanDate(p.end)} · <strong>${nights}박 ${days}일</strong> (${deductText})
-            </div>
-            ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
-          </div>
-        `;
-      }).join('');
+      html += targetPlans.map(p => renderPlanCardHtml(p, false)).join('');
 
       if (!html) {
         list.innerHTML = `<div class="empty-state">등록된 일정이 없습니다.${selectedCalDate ? ' 위 버튼으로 바로 추가해 보세요.' : ''}</div>`;
@@ -1165,7 +1287,7 @@
     // Render Plans
     function renderPlans() {
       const list = document.getElementById('planList');
-      const sorted = [...state.plans].sort((a, b) => a.start.localeCompare(b.start));
+      const sorted = [...state.plans].sort((a, b) => getPlanSortKey(a).localeCompare(getPlanSortKey(b)));
       document.getElementById('planCountText').textContent = `${sorted.length}건`;
 
       if (sorted.length === 0) {
@@ -1173,30 +1295,7 @@
         return;
       }
 
-      list.innerHTML = sorted.map(p => {
-        const days = calcInclusiveDays(p.start, p.end);
-        const nights = Math.max(0, days - 1);
-        const isMalchul = p.type === '말출';
-        const badgeClass = isMalchul ? 'badge-malchul' : (p.type === '외박/외출' ? 'badge-pass' : 'badge-leave');
-        const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
-
-        return `
-          <div class="plan-item ${isMalchul ? 'is-malchul' : ''}" data-id="${p.id}">
-            <div class="plan-top">
-              <div class="plan-title">${escapeHtml(p.title)}</div>
-              <span class="badge ${badgeClass}">${p.type}</span>
-            </div>
-            <div class="plan-meta">
-              ${formatKoreanDate(p.start)} ~ ${formatKoreanDate(p.end)} · <strong>${nights}박 ${days}일</strong> (${deductText})
-            </div>
-            ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
-            <div class="plan-actions">
-              <button class="btn btn-gray btn-sm" data-action="edit" data-id="${p.id}">수정</button>
-              <button class="btn btn-danger-soft btn-sm" data-action="delete" data-id="${p.id}">삭제</button>
-            </div>
-          </div>
-        `;
-      }).join('');
+      list.innerHTML = sorted.map(p => renderPlanCardHtml(p, true)).join('');
     }
 
     // Render Checklist
@@ -1242,6 +1341,12 @@
       renderPlans();
       renderChecklist();
       renderSettings();
+    }
+
+    // Toggle Exact vs TBD date fields
+    function toggleDateModeUI(isTbd) {
+      document.getElementById('exactDateFields').style.display = isTbd ? 'none' : 'grid';
+      document.getElementById('tbdDateFields').style.display = isTbd ? 'grid' : 'none';
     }
 
     // Event Listeners: Tabs
@@ -1294,6 +1399,8 @@
     document.getElementById('btnQuickAddFromCal').addEventListener('click', () => {
       if (!selectedCalDate) return;
       resetPlanForm();
+      document.getElementById('planIsTbd').checked = false;
+      toggleDateModeUI(false);
       document.getElementById('planStart').value = selectedCalDate;
       document.getElementById('planEnd').value = selectedCalDate;
       switchTab('tab-plans');
@@ -1302,12 +1409,13 @@
     });
 
     // Event Listeners: Leave Pool Inputs
-    ['inAnnual', 'inReward', 'inOther', 'inExpected'].forEach(id => {
+    ['inAnnual', 'inReward', 'inOther', 'inJeonhyu', 'inExpected'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => {
         state.leavePool = {
           annual: Math.max(0, Number(document.getElementById('inAnnual').value || 0)),
           reward: Math.max(0, Number(document.getElementById('inReward').value || 0)),
           other: Math.max(0, Number(document.getElementById('inOther').value || 0)),
+          jeonhyu: Math.max(0, Number(document.getElementById('inJeonhyu').value || 0)),
           expected: Math.max(0, Number(document.getElementById('inExpected').value || 0))
         };
         saveState();
@@ -1315,65 +1423,25 @@
       });
     });
 
-    // Event Listeners: Malchul Calculator
-    document.getElementById('malchulDays').addEventListener('input', (e) => {
-      state.malchulCalc.days = Math.max(1, Number(e.target.value || 1));
-      saveState();
-      renderMalchulPreview();
-    });
-
-    document.getElementById('malchulType').addEventListener('change', (e) => {
-      state.malchulCalc.type = e.target.value;
-      saveState();
-      renderMalchulPreview();
-    });
-
-    document.getElementById('btnApplyRemainToMalchul').addEventListener('click', () => {
-      const { remain } = getLeaveSummary();
-      if (remain <= 0) {
-        showToast('남은 휴가 일수가 1일 이상이어야 합니다.');
-        return;
-      }
-      state.malchulCalc.days = remain;
-      saveState();
-      renderDashboard();
-      showToast(`잔여 휴가 ${remain}일이 적용되었습니다.`);
-    });
-
-    document.getElementById('btnAddMalchulPlan').addEventListener('click', () => {
-      const { startStr, endStr, isNoReturn } = getMalchulRange();
-      const existing = state.plans.find(p => p.type === '말출');
-      if (existing) {
-        existing.start = startStr;
-        existing.end = endStr;
-        existing.memo = isNoReturn ? '미복귀 전역 말출' : '전역 전날 복귀 말출';
-      } else {
-        state.plans.push({
-          id: 'p_' + Date.now(),
-          title: '말년휴가 (말출)',
-          type: '말출',
-          start: startStr,
-          end: endStr,
-          noDeduct: false,
-          memo: isNoReturn ? '미복귀 전역 말출' : '전역 전날 복귀 말출'
-        });
-      }
-      saveState();
-      renderAll();
-      showToast('말출 일정이 달력과 일정표에 반영되었습니다.');
-    });
-
     // Event Listeners: Plan Form
     document.getElementById('planType').addEventListener('change', (e) => {
       document.getElementById('planNoDeduct').checked = e.target.value === '외박/외출';
+    });
+
+    document.getElementById('planIsTbd').addEventListener('change', (e) => {
+      toggleDateModeUI(e.target.checked);
     });
 
     function resetPlanForm() {
       document.getElementById('editPlanId').value = '';
       document.getElementById('planTitle').value = '';
       document.getElementById('planType').value = '중간휴가';
+      document.getElementById('planIsTbd').checked = false;
+      toggleDateModeUI(false);
       document.getElementById('planStart').value = '';
       document.getElementById('planEnd').value = '';
+      document.getElementById('planMonth').value = '';
+      document.getElementById('planTbdDays').value = '4';
       document.getElementById('planNoDeduct').checked = false;
       document.getElementById('planMemo').value = '';
       document.getElementById('formHeading').textContent = '새 휴가·외박 일정 추가';
@@ -1386,26 +1454,51 @@
       const id = document.getElementById('editPlanId').value;
       const title = document.getElementById('planTitle').value.trim();
       const type = document.getElementById('planType').value;
-      const start = document.getElementById('planStart').value;
-      const end = document.getElementById('planEnd').value;
+      const isTbd = document.getElementById('planIsTbd').checked;
       const noDeduct = document.getElementById('planNoDeduct').checked;
       const memo = document.getElementById('planMemo').value.trim();
 
-      if (!title || !start || !end) {
-        showToast('일정명과 시작일, 종료일을 모두 입력해 주세요.');
+      if (!title) {
+        showToast('일정명을 입력해 주세요.');
         return;
       }
-      if (calcInclusiveDays(start, end) <= 0) {
-        showToast('종료일은 시작일과 같거나 이후여야 합니다.');
-        return;
+
+      let planData = { title, type, isTbd, noDeduct, memo };
+
+      if (isTbd) {
+        const month = document.getElementById('planMonth').value;
+        const days = Math.max(1, Number(document.getElementById('planTbdDays').value || 0));
+        if (!month || !days) {
+          showToast('예정 월과 사용 일수를 입력해 주세요.');
+          return;
+        }
+        planData.month = month;
+        planData.days = days;
+        planData.start = '';
+        planData.end = '';
+      } else {
+        const start = document.getElementById('planStart').value;
+        const end = document.getElementById('planEnd').value;
+        if (!start || !end) {
+          showToast('시작일과 종료일을 모두 입력해 주세요.');
+          return;
+        }
+        if (calcInclusiveDays(start, end) <= 0) {
+          showToast('종료일은 시작일과 같거나 이후여야 합니다.');
+          return;
+        }
+        planData.start = start;
+        planData.end = end;
+        planData.month = '';
+        planData.days = 0;
       }
 
       if (id) {
         const target = state.plans.find(p => p.id === id);
-        if (target) Object.assign(target, { title, type, start, end, noDeduct, memo });
+        if (target) Object.assign(target, planData);
         showToast('일정이 수정되었습니다.');
       } else {
-        state.plans.push({ id: 'p_' + Date.now(), title, type, start, end, noDeduct, memo });
+        state.plans.push({ id: 'p_' + Date.now(), ...planData });
         showToast('새 일정이 추가되었습니다.');
       }
 
@@ -1432,8 +1525,12 @@
         document.getElementById('editPlanId').value = p.id;
         document.getElementById('planTitle').value = p.title;
         document.getElementById('planType').value = p.type;
-        document.getElementById('planStart').value = p.start;
-        document.getElementById('planEnd').value = p.end;
+        document.getElementById('planIsTbd').checked = !!p.isTbd;
+        toggleDateModeUI(!!p.isTbd);
+        document.getElementById('planStart').value = p.start || '';
+        document.getElementById('planEnd').value = p.end || '';
+        document.getElementById('planMonth').value = p.month || '';
+        document.getElementById('planTbdDays').value = p.days || 4;
         document.getElementById('planNoDeduct').checked = !!p.noDeduct;
         document.getElementById('planMemo').value = p.memo || '';
         document.getElementById('formHeading').textContent = '일정 수정 중';
