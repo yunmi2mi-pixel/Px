@@ -415,7 +415,7 @@
     }
 
     .cal-cell {
-      min-height: 68px;
+      min-height: 66px;
       border-radius: 10px;
       padding: 4px 2px;
       background: #fff;
@@ -438,10 +438,14 @@
       border: 2px solid var(--primary);
     }
 
-    .cal-cell.selected {
-      background: #f0f6ff;
-      border-color: var(--primary);
-      box-shadow: inset 0 0 0 1px var(--primary);
+    .cal-cell.in-range {
+      background: #e8f3ff;
+      border-color: #90c2ff;
+    }
+
+    .cal-cell.range-edge {
+      background: #d0e5ff;
+      border: 2px solid var(--primary);
     }
 
     .cal-day-num {
@@ -498,6 +502,68 @@
     .cal-bar.pass { background: var(--warning); }
     .cal-bar.combat { background: var(--teal); }
     .cal-bar.discharge { background: var(--danger); }
+
+    /* Quick Picker Box inside Calendar */
+    .quick-picker {
+      margin-top: 14px;
+      background: #f8fbff;
+      border: 1.5px solid var(--primary);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .quick-picker-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .quick-picker-range {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .quick-picker-hint {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 10px;
+    }
+
+    .quick-title-input {
+      margin-bottom: 10px;
+      padding: 9px 12px !important;
+      font-size: 13px !important;
+    }
+
+    .quick-type-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .quick-type-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .quick-type-btn:active { opacity: 0.78; }
+    .quick-type-btn.malchul { background: var(--primary); }
+    .quick-type-btn.leave { background: var(--success); }
+    .quick-type-btn.pass { background: var(--warning); }
+    .quick-type-btn.combat { background: var(--teal); }
 
     /* Schedule List */
     .plan-item {
@@ -810,12 +876,27 @@
           <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
         </div>
         <div class="cal-grid" id="calGrid"></div>
+
+        <!-- 날짜 선택 시 바로 등록 패널 -->
+        <div id="calQuickPicker" class="quick-picker" style="display:none;">
+          <div class="quick-picker-top">
+            <div class="quick-picker-range" id="quickRangeText"></div>
+            <button class="btn btn-gray btn-sm" id="btnClearRange">선택 해제</button>
+          </div>
+          <div class="quick-picker-hint" id="quickRangeHint"></div>
+          <input type="text" id="quickTitleInput" class="quick-title-input" placeholder="일정명 (비워두면 버튼 이름으로 등록)" />
+          <div class="quick-type-grid" id="quickTypeButtons">
+            <button class="quick-type-btn malchul" data-quick-type="말출">말출</button>
+            <button class="quick-type-btn leave" data-quick-type="중간휴가">중간휴가</button>
+            <button class="quick-type-btn pass" data-quick-type="외박/외출">외박/외출</button>
+            <button class="quick-type-btn combat" data-quick-type="전투휴무">전투휴무</button>
+          </div>
+        </div>
       </div>
 
       <div class="card">
         <div class="card-title">
           <span id="calDetailHeading">이번 달 일정</span>
-          <button class="btn btn-soft btn-sm" id="btnQuickAddFromCal" style="display:none;">+ 이 날짜로 추가</button>
         </div>
         <div id="calDetailList"></div>
       </div>
@@ -850,7 +931,6 @@
           <span>날짜 미정 (월만 확정됨)</span>
         </label>
 
-        <!-- 확정 날짜 입력 영역 -->
         <div class="grid-2" id="exactDateFields">
           <div class="field">
             <label for="planStart">시작일</label>
@@ -862,7 +942,6 @@
           </div>
         </div>
 
-        <!-- 월만 확정 입력 영역 -->
         <div class="grid-2" id="tbdDateFields" style="display:none;">
           <div class="field">
             <label for="planMonth">예정 월</label>
@@ -879,7 +958,6 @@
           <span>휴가 일수 차감 안 함 (외박·전투휴무 등)</span>
         </label>
 
-        <!-- 휴가 종류별 차감 배분 -->
         <div class="breakdown-box" id="breakdownBox">
           <div class="breakdown-head">
             <span>휴가 종류별 차감 (일)</span>
@@ -1015,9 +1093,7 @@
       expected: '추가예정'
     };
 
-    // 2026~2027 공휴일 (5월 3일 포함)
     const KR_HOLIDAYS = {
-      // 2026년
       '2026-01-01': '신정',
       '2026-02-16': '설연휴',
       '2026-02-17': '설날',
@@ -1038,7 +1114,6 @@
       '2026-10-05': '대체휴일',
       '2026-10-09': '한글날',
       '2026-12-25': '성탄절',
-      // 2027년
       '2027-01-01': '신정',
       '2027-02-06': '설연휴',
       '2027-02-07': '설날',
@@ -1120,11 +1195,12 @@
 
     let state = loadState();
 
-    // Calendar UI State
+    // Calendar UI State (Range Selection)
     const nowInit = new Date();
     let calYear = nowInit.getFullYear();
     let calMonth = nowInit.getMonth();
-    let selectedCalDate = null;
+    let rangeStart = null; // 'YYYY-MM-DD'
+    let rangeEnd = null;   // 'YYYY-MM-DD'
 
     function loadState() {
       try {
@@ -1216,7 +1292,6 @@
           };
         }
       }
-      // 기존 데이터 호환: 배분이 없으면 연가로 자동 간주
       return { ...empty, annual: getPlanDays(p) };
     }
 
@@ -1344,6 +1419,31 @@
       return 'badge-leave';
     }
 
+    function renderQuickPicker() {
+      const box = document.getElementById('calQuickPicker');
+      if (!rangeStart) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.style.display = 'block';
+      const effectiveEnd = rangeEnd || rangeStart;
+      const days = calcInclusiveDays(rangeStart, effectiveEnd);
+      const nights = Math.max(0, days - 1);
+
+      if (rangeEnd && rangeEnd !== rangeStart) {
+        document.getElementById('quickRangeText').textContent =
+          `${formatKoreanDate(rangeStart)} ~ ${formatKoreanDate(rangeEnd)} (${nights}박 ${days}일)`;
+        document.getElementById('quickRangeHint').textContent =
+          '아래 버튼을 누르면 선택한 기간이 바로 등록됩니다.';
+      } else {
+        document.getElementById('quickRangeText').textContent =
+          `${formatKoreanDate(rangeStart)} (1일)`;
+        document.getElementById('quickRangeHint').textContent =
+          '종료 날짜를 한 번 더 누르거나, 하루 일정이면 바로 버튼을 누르세요.';
+      }
+    }
+
     function renderCalendar() {
       document.getElementById('calMonthTitle').textContent = `${calYear}년 ${calMonth + 1}월`;
       const currentMonthKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
@@ -1377,9 +1477,11 @@
         const dateStr = formatDate(dateObj);
         const dow = dateObj.getDay();
         const isToday = dateStr === todayStr;
-        const isSelected = dateStr === selectedCalDate;
         const isDischarge = dateStr === state.dischargeDate;
         const holidayName = KR_HOLIDAYS[dateStr] || '';
+
+        const isRangeEdge = dateStr === rangeStart || dateStr === rangeEnd;
+        const isInRange = rangeStart && rangeEnd && dateStr >= rangeStart && dateStr <= rangeEnd;
 
         const dayPlans = state.plans.filter(p => !p.isTbd && p.start <= dateStr && dateStr <= p.end);
 
@@ -1402,7 +1504,8 @@
           dow === 6 ? 'sat' : '',
           holidayName ? 'holiday' : '',
           isToday ? 'today' : '',
-          isSelected ? 'selected' : ''
+          isInRange ? 'in-range' : '',
+          isRangeEdge ? 'range-edge' : ''
         ].filter(Boolean).join(' ');
 
         html += `
@@ -1415,6 +1518,7 @@
       }
 
       grid.innerHTML = html;
+      renderQuickPicker();
       renderCalendarDetails();
     }
 
@@ -1454,21 +1558,25 @@
 
     function renderCalendarDetails() {
       const heading = document.getElementById('calDetailHeading');
-      const quickBtn = document.getElementById('btnQuickAddFromCal');
       const list = document.getElementById('calDetailList');
 
       let targetPlans = [];
       let showDischargeCard = false;
 
-      if (selectedCalDate) {
-        const holidayText = KR_HOLIDAYS[selectedCalDate] || '';
-        heading.textContent = `${formatKoreanDate(selectedCalDate)}${holidayText ? ` · ${holidayText}` : ''}`;
-        quickBtn.style.display = 'inline-flex';
-        targetPlans = state.plans.filter(p => !p.isTbd && p.start <= selectedCalDate && selectedCalDate <= p.end);
-        showDischargeCard = selectedCalDate === state.dischargeDate;
+      if (rangeStart) {
+        const effectiveEnd = rangeEnd || rangeStart;
+        if (rangeEnd && rangeEnd !== rangeStart) {
+          heading.textContent = `선택 기간 일정 (${rangeStart.slice(5)} ~ ${rangeEnd.slice(5)})`;
+        } else {
+          const holidayText = KR_HOLIDAYS[rangeStart] || '';
+          heading.textContent = `${formatKoreanDate(rangeStart)}${holidayText ? ` · ${holidayText}` : ''}`;
+        }
+        targetPlans = state.plans
+          .filter(p => !p.isTbd && p.start <= effectiveEnd && p.end >= rangeStart)
+          .sort((a, b) => getPlanSortKey(a).localeCompare(getPlanSortKey(b)));
+        showDischargeCard = state.dischargeDate >= rangeStart && state.dischargeDate <= effectiveEnd;
       } else {
         heading.textContent = `${calYear}년 ${calMonth + 1}월 전체 일정`;
-        quickBtn.style.display = 'none';
         const currentMonthKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
         const monthStart = formatDate(new Date(calYear, calMonth, 1));
         const monthEnd = formatDate(new Date(calYear, calMonth + 1, 0));
@@ -1494,7 +1602,7 @@
       html += targetPlans.map(p => renderPlanCardHtml(p, true)).join('');
 
       if (!html) {
-        list.innerHTML = `<div class="empty-state">등록된 일정이 없습니다.${selectedCalDate ? ' 위 버튼으로 바로 추가해 보세요.' : ''}</div>`;
+        list.innerHTML = `<div class="empty-state">등록된 일정이 없습니다.</div>`;
       } else {
         list.innerHTML = html;
       }
@@ -1598,7 +1706,7 @@
       statusEl.className = `breakdown-status ${targetDays > 0 && sum > 0 && sum !== targetDays ? 'mismatch' : ''}`;
     }
 
-    // Shared Edit / Delete Action for both Calendar & Plan List
+    // Shared Edit / Delete Action
     function handlePlanAction(action, id) {
       if (action === 'delete') {
         if (!confirm('이 일정을 삭제할까요?')) return;
@@ -1644,18 +1752,16 @@
       switchTab(btn.dataset.tab);
     });
 
-    // Event Listeners: Calendar Navigation & Selection
+    // Event Listeners: Calendar Navigation & Range Selection
     document.getElementById('btnCalPrev').addEventListener('click', () => {
       calMonth--;
       if (calMonth < 0) { calMonth = 11; calYear--; }
-      selectedCalDate = null;
       renderCalendar();
     });
 
     document.getElementById('btnCalNext').addEventListener('click', () => {
       calMonth++;
       if (calMonth > 11) { calMonth = 0; calYear++; }
-      selectedCalDate = null;
       renderCalendar();
     });
 
@@ -1663,7 +1769,8 @@
       const now = new Date();
       calYear = now.getFullYear();
       calMonth = now.getMonth();
-      selectedCalDate = formatDate(now);
+      rangeStart = formatDate(now);
+      rangeEnd = null;
       renderCalendar();
     });
 
@@ -1672,7 +1779,8 @@
       if (!d) return;
       calYear = d.getFullYear();
       calMonth = d.getMonth();
-      selectedCalDate = state.dischargeDate;
+      rangeStart = state.dischargeDate;
+      rangeEnd = null;
       renderCalendar();
     });
 
@@ -1680,31 +1788,74 @@
       const cell = e.target.closest('.cal-cell[data-date]');
       if (!cell) return;
       const dateStr = cell.dataset.date;
-      selectedCalDate = selectedCalDate === dateStr ? null : dateStr;
+
+      if (!rangeStart || (rangeStart && rangeEnd)) {
+        // 새 범위 시작
+        rangeStart = dateStr;
+        rangeEnd = null;
+      } else {
+        // 종료일 선택 (역순 클릭 시 자동 정렬)
+        if (dateStr < rangeStart) {
+          rangeEnd = rangeStart;
+          rangeStart = dateStr;
+        } else {
+          rangeEnd = dateStr;
+        }
+      }
       renderCalendar();
     });
 
-    document.getElementById('btnQuickAddFromCal').addEventListener('click', () => {
-      if (!selectedCalDate) return;
-      resetPlanForm();
-      document.getElementById('planIsTbd').checked = false;
-      toggleDateModeUI(false);
-      document.getElementById('planStart').value = selectedCalDate;
-      document.getElementById('planEnd').value = selectedCalDate;
-      updateBreakdownStatus();
-      switchTab('tab-plans');
-      document.getElementById('planTitle').focus();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('btnClearRange').addEventListener('click', () => {
+      rangeStart = null;
+      rangeEnd = null;
+      document.getElementById('quickTitleInput').value = '';
+      renderCalendar();
     });
 
-    // Event Delegation: Calendar Details Edit/Delete
+    // Quick 1-Tap Registration from Calendar
+    document.getElementById('quickTypeButtons').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-quick-type]');
+      if (!btn || !rangeStart) return;
+
+      const type = btn.dataset.quickType;
+      const start = rangeStart;
+      const end = rangeEnd || rangeStart;
+      const days = calcInclusiveDays(start, end);
+      const customTitle = document.getElementById('quickTitleInput').value.trim();
+      const title = customTitle || type;
+      const noDeduct = type === '외박/외출' || type === '전투휴무';
+
+      state.plans.push({
+        id: 'p_' + Date.now(),
+        title,
+        type,
+        isTbd: false,
+        start,
+        end,
+        month: '',
+        days: 0,
+        noDeduct,
+        deductBreakdown: noDeduct
+          ? { annual: 0, reward: 0, other: 0, jeonhyu: 0, expected: 0 }
+          : { annual: days, reward: 0, other: 0, jeonhyu: 0, expected: 0 },
+        memo: ''
+      });
+
+      rangeStart = null;
+      rangeEnd = null;
+      document.getElementById('quickTitleInput').value = '';
+      saveState();
+      renderAll();
+      showToast(`'${title}' (${days}일) 등록 완료!`);
+    });
+
+    // Event Delegation: Calendar Details & Plan List Edit/Delete
     document.getElementById('calDetailList').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
       handlePlanAction(btn.dataset.action, btn.dataset.id);
     });
 
-    // Event Delegation: Plan List Edit/Delete
     document.getElementById('planList').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
@@ -1821,7 +1972,6 @@
         const bd = getFormBreakdownValues();
         const bdSum = LEAVE_KEYS.reduce((acc, k) => acc + bd[k], 0);
         if (bdSum === 0) {
-          // 배분을 안 적었으면 연가로 자동 배정
           planData.deductBreakdown = { annual: totalPlanDays, reward: 0, other: 0, jeonhyu: 0, expected: 0 };
         } else if (bdSum !== totalPlanDays) {
           showToast(`배분 합계(${bdSum}일)와 일정 일수(${totalPlanDays}일)가 다릅니다.`);
