@@ -649,6 +649,7 @@
     .badge-visit { background: var(--pink-light); color: var(--pink); }
     .badge-discharge { background: var(--danger-light); color: var(--danger); }
     .badge-tbd { background: var(--purple-light); color: var(--purple); }
+    .badge-tmo { background: var(--success-light); color: var(--success); }
     .badge-notmo { background: #fff0f0; color: var(--danger); border: 1px solid #ffc9c9; }
 
     .plan-meta {
@@ -876,12 +877,12 @@
       <!-- 달별 총 교통비 카드 -->
       <div class="card">
         <div class="card-title">
-          <span>달별 총 교통비 (TMO 미적용)</span>
-          <span class="card-sub" id="totalAllCostText">총 0원</span>
+          <span>달별 총 교통비 (휴가 전용)</span>
+          <span class="card-sub" id="totalAllCostText">누적 0원</span>
         </div>
         <div class="field">
           <label for="inDefaultTransport">
-            <span>기본 왕복 교통비 (원) · 포상/위로/외박 자동 적용</span>
+            <span>기본 왕복 교통비 (원) · 포상/위로 단독 외 자동 적용</span>
           </label>
           <input type="number" id="inDefaultTransport" min="0" step="1000" value="50000" />
         </div>
@@ -927,12 +928,12 @@
           </div>
           <div class="quick-picker-hint" id="quickRangeHint"></div>
 
-          <div class="quick-sub-label">휴가 종류 선택 (말출·중간휴가 등록 시 적용)</div>
+          <div class="quick-sub-label">휴가 종류 선택 (포상·위로 단독만 TMO 적용)</div>
           <div class="quick-kind-row" id="quickKindRow">
-            <button class="kind-pill active" data-kind="annual">연가 (TMO)</button>
-            <button class="kind-pill" data-kind="reward">포상 (자비)</button>
-            <button class="kind-pill" data-kind="other">위로 (자비)</button>
-            <button class="kind-pill" data-kind="expected">예정</button>
+            <button class="kind-pill active" data-kind="annual">연가 (자비)</button>
+            <button class="kind-pill" data-kind="reward">포상 (TMO)</button>
+            <button class="kind-pill" data-kind="other">위로 (TMO)</button>
+            <button class="kind-pill" data-kind="expected">예정 (자비)</button>
           </div>
 
           <input type="text" id="quickTitleInput" class="quick-title-input" placeholder="일정명 (비워두면 버튼 이름으로 등록)" />
@@ -1018,19 +1019,19 @@
           </div>
           <div class="grid-2">
             <div class="field">
-              <label for="bdAnnual">연가 (TMO O)</label>
+              <label for="bdAnnual">연가 (TMO X)</label>
               <input type="number" id="bdAnnual" min="0" value="0" />
             </div>
             <div class="field">
-              <label for="bdReward">포상 (TMO X)</label>
+              <label for="bdReward">포상 (단독 TMO O)</label>
               <input type="number" id="bdReward" min="0" value="0" />
             </div>
             <div class="field">
-              <label for="bdOther">위로·보상 (TMO X)</label>
+              <label for="bdOther">위로·보상 (단독 TMO O)</label>
               <input type="number" id="bdOther" min="0" value="0" />
             </div>
             <div class="field">
-              <label for="bdExpected">추가예정</label>
+              <label for="bdExpected">추가예정 (TMO X)</label>
               <input type="number" id="bdExpected" min="0" value="0" />
             </div>
           </div>
@@ -1039,10 +1040,10 @@
         <!-- 교통비 입력 영역 -->
         <div class="field">
           <label for="planTransportCost">
-            <span>왕복 교통비 (원) · TMO 적용 시 0원</span>
-            <button type="button" class="btn btn-gray btn-sm" id="btnAutoCost" style="padding: 2px 8px; font-size: 11px;">자동계산</button>
+            <span>왕복 교통비 (원) · 비워두면 규칙대로 자동 계산</span>
+            <button type="button" class="btn btn-gray btn-sm" id="btnAutoCost" style="padding: 2px 8px; font-size: 11px;">자동값 채우기</button>
           </label>
-          <input type="number" id="planTransportCost" min="0" step="1000" value="0" />
+          <input type="number" id="planTransportCost" min="0" step="1000" placeholder="비워두면 자동 계산" />
         </div>
 
         <div class="field">
@@ -1216,7 +1217,7 @@
           end: '2026-12-20',
           noDeduct: true,
           deductBreakdown: { annual: 0, reward: 0, other: 0, expected: 0 },
-          transportCost: 50000,
+          customCost: null,
           memo: '가족 모임 / 부대 인근 숙소'
         },
         {
@@ -1228,7 +1229,7 @@
           days: 4,
           noDeduct: false,
           deductBreakdown: { annual: 4, reward: 0, other: 0, expected: 0 },
-          transportCost: 0,
+          customCost: null,
           memo: '3박 4일 비발디파크 예정 (날짜 추후 확정)'
         },
         {
@@ -1240,7 +1241,7 @@
           end: '2027-03-17',
           noDeduct: false,
           deductBreakdown: { annual: 5, reward: 2, other: 0, expected: 0 },
-          transportCost: 0,
+          customCost: null,
           memo: '국외여행 허가 출국 1~2개월 전 신청 필수 / 김해공항 출국'
         }
       ],
@@ -1263,7 +1264,7 @@
     let calMonth = nowInit.getMonth();
     let rangeStart = null;
     let rangeEnd = null;
-    let selectedQuickKind = 'annual'; // 'annual' | 'reward' | 'other' | 'expected'
+    let selectedQuickKind = 'annual';
 
     function loadState() {
       try {
@@ -1345,11 +1346,6 @@
       return calcInclusiveDays(p.start, p.end);
     }
 
-    function getPlanMonthKey(p) {
-      if (p.isTbd) return p.month || '';
-      return p.start ? p.start.slice(0, 7) : '';
-    }
-
     function getPlanBreakdown(p) {
       const empty = { annual: 0, reward: 0, other: 0, expected: 0 };
       if (p.noDeduct) return empty;
@@ -1367,21 +1363,50 @@
       return { ...empty, annual: getPlanDays(p) };
     }
 
-    function isNoTmoPlan(type, bd) {
-      if (type === '전투휴무' || type === '면회') return false;
-      if (type === '외박/외출') return true;
-      // 연가가 1일이라도 포함되면 TMO 적용, 포상/위로만 있으면 TMO 미적용
-      if (Number(bd.annual || 0) > 0) return false;
-      if (Number(bd.reward || 0) > 0 || Number(bd.other || 0) > 0) return true;
-      return false;
+    function isLeavePlanType(type) {
+      return type === '말출' || type === '중간휴가';
+    }
+
+    // TMO 규칙: 휴가(말출/중간휴가) 중 '포상' 또는 '위로' 한 가지 유형만 단독 사용 시 TMO 적용(0원)
+    function hasTmoBenefit(type, bd) {
+      if (!isLeavePlanType(type)) return false;
+      const activeKeys = LEAVE_KEYS.filter(k => Number(bd[k] || 0) > 0);
+      return activeKeys.length === 1 && (activeKeys[0] === 'reward' || activeKeys[0] === 'other');
+    }
+
+    function calcAutoTransportCost(type, bd) {
+      if (!isLeavePlanType(type)) return 0; // 휴가 때만 교통비 계산
+      if (hasTmoBenefit(type, bd)) return 0; // 포상·위로 단독 사용 시 TMO 적용
+      return Math.max(0, Number(state.defaultTransportCost || 0));
     }
 
     function getPlanTransportCost(p) {
-      if (p.transportCost !== undefined && p.transportCost !== null) {
-        return Math.max(0, Number(p.transportCost || 0));
+      if (!isLeavePlanType(p.type)) return 0;
+      if (p.customCost !== undefined && p.customCost !== null && p.customCost !== '') {
+        return Math.max(0, Number(p.customCost));
       }
-      const bd = getPlanBreakdown(p);
-      return isNoTmoPlan(p.type, bd) ? Number(state.defaultTransportCost || 0) : 0;
+      return calcAutoTransportCost(p.type, getPlanBreakdown(p));
+    }
+
+    // 월 걸친 휴가(예: 6월~7월) 반반 분할 계산
+    function getPlanMonthlyCostSplits(p) {
+      const cost = getPlanTransportCost(p);
+      if (cost <= 0) return [];
+      if (p.isTbd) {
+        return p.month ? [{ month: p.month, amount: cost, isSplit: false }] : [];
+      }
+      const startMonth = p.start ? p.start.slice(0, 7) : '';
+      const endMonth = p.end ? p.end.slice(0, 7) : '';
+      if (!startMonth) return [];
+      if (!endMonth || startMonth === endMonth) {
+        return [{ month: startMonth, amount: cost, isSplit: false }];
+      }
+      const firstHalf = Math.round(cost / 2);
+      const secondHalf = cost - firstHalf;
+      return [
+        { month: startMonth, amount: firstHalf, isSplit: true },
+        { month: endMonth, amount: secondHalf, isSplit: true }
+      ];
     }
 
     function formatBreakdownText(p) {
@@ -1391,9 +1416,8 @@
       return parts.length ? parts.join(' + ') : '';
     }
 
-    // 달력 칸에 표시할 텍스트 (연가/포상/위로 등 종류 표시)
     function getCalendarBarLabel(p) {
-      if (p.type === '외박/외출' || p.type === '전투휴무' || p.type === '면회') {
+      if (!isLeavePlanType(p.type)) {
         return p.title.length > 5 ? p.title.slice(0, 5) : p.title;
       }
       const bd = getPlanBreakdown(p);
@@ -1455,20 +1479,19 @@
       return { total, used, remain, usedByType, remainByType, futureOutDays };
     }
 
-    // Monthly Transport Cost Calculation
+    // Monthly Transport Cost Summary (반반 분할 포함)
     function getMonthlyCostSummary() {
       const byMonth = {};
       let totalCost = 0;
 
       state.plans.forEach(p => {
-        const cost = getPlanTransportCost(p);
-        if (cost <= 0) return;
-        const mKey = getPlanMonthKey(p);
-        if (!mKey) return;
-        if (!byMonth[mKey]) byMonth[mKey] = { cost: 0, count: 0 };
-        byMonth[mKey].cost += cost;
-        byMonth[mKey].count += 1;
-        totalCost += cost;
+        const splits = getPlanMonthlyCostSplits(p);
+        splits.forEach(({ month, amount }) => {
+          if (!byMonth[month]) byMonth[month] = { cost: 0, count: 0 };
+          byMonth[month].cost += amount;
+          byMonth[month].count += 1;
+          totalCost += amount;
+        });
       });
 
       return { byMonth, totalCost };
@@ -1530,13 +1553,12 @@
         el.className = `remain-tag ${val < 0 ? 'negative' : ''}`;
       });
 
-      // Render Monthly Transport Cost List
       const { byMonth, totalCost } = getMonthlyCostSummary();
       document.getElementById('totalAllCostText').textContent = `누적 ${formatWon(totalCost)}`;
       const costList = document.getElementById('monthlyCostList');
       const months = Object.keys(byMonth).sort();
       if (months.length === 0) {
-        costList.innerHTML = `<div class="empty-state" style="padding: 12px 0;">교통비가 발생하는 일정이 없습니다.</div>`;
+        costList.innerHTML = `<div class="empty-state" style="padding: 12px 0;">교통비가 발생하는 휴가가 없습니다.</div>`;
       } else {
         costList.innerHTML = months.map(m => {
           const [y, mm] = m.split('-');
@@ -1572,7 +1594,7 @@
     }
 
     function isAutoNoDeductType(type) {
-      return type === '외박/외출' || type === '전투휴무' || type === '면회';
+      return !isLeavePlanType(type);
     }
 
     function renderQuickPicker() {
@@ -1604,14 +1626,13 @@
       document.getElementById('calMonthTitle').textContent = `${calYear}년 ${calMonth + 1}월`;
       const currentMonthKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
 
-      // 이번 달 총 교통비 배너
       const { byMonth } = getMonthlyCostSummary();
       const monthCostInfo = byMonth[currentMonthKey];
       const costBanner = document.getElementById('calCostBanner');
       if (monthCostInfo && monthCostInfo.cost > 0) {
         costBanner.style.display = 'flex';
         costBanner.innerHTML = `
-          <span>🚆 ${calMonth + 1}월 예상 교통비 (TMO 미적용 ${monthCostInfo.count}건)</span>
+          <span>🚆 ${calMonth + 1}월 총 교통비 (${monthCostInfo.count}건)</span>
           <strong>${formatWon(monthCostInfo.cost)}</strong>
         `;
       } else {
@@ -1699,16 +1720,30 @@
       const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
       const breakdownText = formatBreakdownText(p);
       const cost = getPlanTransportCost(p);
+      const splits = getPlanMonthlyCostSplits(p);
+      const isTmo = isLeavePlanType(p.type) && cost === 0;
 
       const dateText = p.isTbd
         ? `${formatKoreanMonth(p.month)} (날짜 미정) · <strong>${nights}박 ${days}일</strong> (${deductText})`
         : `${formatKoreanDate(p.start)} ~ ${formatKoreanDate(p.end)} · <strong>${nights}박 ${days}일</strong> (${deductText})`;
+
+      let costLineHtml = '';
+      if (cost > 0) {
+        if (splits.length === 2) {
+          const m1 = Number(splits[0].month.split('-')[1]);
+          const m2 = Number(splits[1].month.split('-')[1]);
+          costLineHtml = `<div class="plan-cost-line">🚆 왕복 교통비: ${formatWon(cost)} (${m1}월 ${formatWon(splits[0].amount)} / ${m2}월 ${formatWon(splits[1].amount)} 반반)</div>`;
+        } else {
+          costLineHtml = `<div class="plan-cost-line">🚆 왕복 교통비: ${formatWon(cost)}</div>`;
+        }
+      }
 
       return `
         <div class="plan-item ${isMalchul ? 'is-malchul' : ''} ${p.isTbd ? 'is-tbd' : ''}" data-id="${p.id}">
           <div class="plan-top">
             <div class="plan-title">${escapeHtml(p.title)}</div>
             <div class="badge-group">
+              ${isTmo ? `<span class="badge badge-tmo">TMO O</span>` : ''}
               ${cost > 0 ? `<span class="badge badge-notmo">TMO X</span>` : ''}
               ${p.isTbd ? `<span class="badge badge-tbd">날짜미정</span>` : ''}
               <span class="badge ${badgeClass}">${p.type}</span>
@@ -1716,7 +1751,7 @@
           </div>
           <div class="plan-meta">${dateText}</div>
           ${breakdownText ? `<div class="plan-breakdown-line">휴가 종류: ${breakdownText}</div>` : ''}
-          ${cost > 0 ? `<div class="plan-cost-line">🚆 왕복 교통비: ${formatWon(cost)}</div>` : ''}
+          ${costLineHtml}
           ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
           ${showActions ? `
             <div class="plan-actions">
@@ -1871,8 +1906,7 @@
     function autoFillFormTransportCost() {
       const type = document.getElementById('planType').value;
       const bd = getFormBreakdownValues();
-      const cost = isNoTmoPlan(type, bd) ? Number(state.defaultTransportCost || 0) : 0;
-      document.getElementById('planTransportCost').value = cost;
+      document.getElementById('planTransportCost').value = calcAutoTransportCost(type, bd);
     }
 
     function updateBreakdownStatus() {
@@ -1914,7 +1948,8 @@
         document.getElementById('bdExpected').value = bd.expected;
         updateBreakdownStatus();
 
-        document.getElementById('planTransportCost').value = getPlanTransportCost(p);
+        document.getElementById('planTransportCost').value =
+          (p.customCost !== undefined && p.customCost !== null) ? p.customCost : '';
         document.getElementById('planMemo').value = p.memo || '';
         document.getElementById('formHeading').textContent = '일정 수정 중';
         document.getElementById('btnCancelEdit').style.display = 'inline-flex';
@@ -1988,7 +2023,6 @@
       renderCalendar();
     });
 
-    // Quick Kind Selection (연가 / 포상 / 위로 / 예정)
     document.getElementById('quickKindRow').addEventListener('click', (e) => {
       const btn = e.target.closest('.kind-pill[data-kind]');
       if (!btn) return;
@@ -2016,7 +2050,7 @@
         bd[selectedQuickKind] = days;
       }
 
-      const transportCost = isNoTmoPlan(type, bd) ? Number(state.defaultTransportCost || 0) : 0;
+      const autoCost = calcAutoTransportCost(type, bd);
 
       state.plans.push({
         id: 'p_' + Date.now(),
@@ -2029,7 +2063,7 @@
         days: 0,
         noDeduct,
         deductBreakdown: bd,
-        transportCost,
+        customCost: null,
         memo: ''
       });
 
@@ -2038,8 +2072,8 @@
       document.getElementById('quickTitleInput').value = '';
       saveState();
       renderAll();
-      showToast(transportCost > 0
-        ? `'${title}' 등록 완료 (교통비 ${formatWon(transportCost)})`
+      showToast(autoCost > 0
+        ? `'${title}' 등록 완료 (교통비 ${formatWon(autoCost)})`
         : `'${title}' (${days}일) 등록 완료!`);
     });
 
@@ -2077,6 +2111,7 @@
       saveState();
       renderDashboard();
       renderCalendar();
+      renderPlans();
     });
 
     // Event Listeners: Plan Form
@@ -2084,7 +2119,6 @@
       const noDeduct = isAutoNoDeductType(e.target.value);
       document.getElementById('planNoDeduct').checked = noDeduct;
       toggleBreakdownUI(noDeduct);
-      autoFillFormTransportCost();
     });
 
     document.getElementById('planIsTbd').addEventListener('change', (e) => {
@@ -2093,23 +2127,15 @@
 
     document.getElementById('planNoDeduct').addEventListener('change', (e) => {
       toggleBreakdownUI(e.target.checked);
-      autoFillFormTransportCost();
     });
 
-    ['planStart', 'planEnd', 'planTbdDays'].forEach(id => {
+    ['planStart', 'planEnd', 'planTbdDays', 'bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateBreakdownStatus);
-    });
-
-    ['bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        updateBreakdownStatus();
-        autoFillFormTransportCost();
-      });
     });
 
     document.getElementById('btnAutoCost').addEventListener('click', () => {
       autoFillFormTransportCost();
-      showToast('TMO 여부에 맞춰 교통비가 자동 계산되었습니다.');
+      showToast('TMO 규칙에 맞춰 교통비가 채워졌습니다.');
     });
 
     function resetPlanForm() {
@@ -2127,7 +2153,7 @@
       ['bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
         document.getElementById(id).value = '0';
       });
-      document.getElementById('planTransportCost').value = '0';
+      document.getElementById('planTransportCost').value = '';
       updateBreakdownStatus();
       document.getElementById('planMemo').value = '';
       document.getElementById('formHeading').textContent = '새 휴가·외박 일정 추가';
@@ -2142,7 +2168,8 @@
       const type = document.getElementById('planType').value;
       const isTbd = document.getElementById('planIsTbd').checked;
       const noDeduct = document.getElementById('planNoDeduct').checked;
-      const transportCost = Math.max(0, Number(document.getElementById('planTransportCost').value || 0));
+      const rawCost = document.getElementById('planTransportCost').value.trim();
+      const customCost = rawCost === '' ? null : Math.max(0, Number(rawCost));
       const memo = document.getElementById('planMemo').value.trim();
 
       if (!title) {
@@ -2150,7 +2177,7 @@
         return;
       }
 
-      let planData = { title, type, isTbd, noDeduct, transportCost, memo };
+      let planData = { title, type, isTbd, noDeduct, customCost, memo };
       let totalPlanDays = 0;
 
       if (isTbd) {
