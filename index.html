@@ -191,17 +191,43 @@
     .stat-val.success { color: var(--success); }
     .stat-val.danger { color: var(--danger); }
 
+    /* Monthly Cost List */
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .cost-row:last-child { border-bottom: none; }
+    .cost-month { font-weight: 700; }
+    .cost-detail { font-size: 12px; color: var(--sub); margin-left: 6px; font-weight: 500; }
+    .cost-amount { font-weight: 800; color: var(--danger); }
+
+    .cal-cost-banner {
+      background: var(--warning-light);
+      border: 1px solid #ffd8a8;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .cal-cost-banner strong {
+      color: #d9480f;
+      font-size: 15px;
+    }
+
     /* Form Controls */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
     }
 
     .field {
@@ -224,13 +250,8 @@
       color: var(--success);
     }
 
-    .remain-tag.negative {
-      color: var(--danger);
-    }
-
-    .remain-tag.neutral {
-      color: var(--sub);
-    }
+    .remain-tag.negative { color: var(--danger); }
+    .remain-tag.neutral { color: var(--sub); }
 
     input[type="text"],
     input[type="number"],
@@ -293,18 +314,9 @@
       color: var(--primary);
     }
 
-    .breakdown-status.mismatch {
-      color: var(--danger);
-    }
-
-    .breakdown-box .field {
-      margin-bottom: 0;
-    }
-
-    .breakdown-box input {
-      padding: 7px 8px;
-      font-size: 13px;
-    }
+    .breakdown-status.mismatch { color: var(--danger); }
+    .breakdown-box .field { margin-bottom: 0; }
+    .breakdown-box input { padding: 7px 8px; font-size: 13px; }
 
     /* Buttons */
     .btn {
@@ -440,19 +452,9 @@
       cursor: default;
     }
 
-    .cal-cell.today {
-      border: 2px solid var(--primary);
-    }
-
-    .cal-cell.in-range {
-      background: #e8f3ff;
-      border-color: #90c2ff;
-    }
-
-    .cal-cell.range-edge {
-      background: #d0e5ff;
-      border: 2px solid var(--primary);
-    }
+    .cal-cell.today { border: 2px solid var(--primary); }
+    .cal-cell.in-range { background: #e8f3ff; border-color: #90c2ff; }
+    .cal-cell.range-edge { background: #d0e5ff; border: 2px solid var(--primary); }
 
     .cal-day-num {
       font-size: 12px;
@@ -461,13 +463,8 @@
     }
 
     .cal-cell.sun .cal-day-num,
-    .cal-cell.holiday .cal-day-num {
-      color: var(--danger);
-    }
-
-    .cal-cell.sat:not(.holiday) .cal-day-num {
-      color: var(--primary);
-    }
+    .cal-cell.holiday .cal-day-num { color: var(--danger); }
+    .cal-cell.sat:not(.holiday) .cal-day-num { color: var(--primary); }
 
     .cal-holiday-name {
       font-size: 9px;
@@ -491,7 +488,7 @@
 
     .cal-bar {
       width: 100%;
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       padding: 1px 2px;
       border-radius: 4px;
@@ -523,7 +520,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       gap: 8px;
     }
 
@@ -537,6 +534,39 @@
       font-size: 12px;
       color: var(--sub);
       margin-bottom: 10px;
+    }
+
+    .quick-sub-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 6px;
+    }
+
+    .quick-kind-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .kind-pill {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .kind-pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
     }
 
     .quick-title-input {
@@ -582,16 +612,8 @@
       background: #fff;
     }
 
-    .plan-item.is-malchul {
-      border-color: var(--primary);
-      background: #f8fbff;
-    }
-
-    .plan-item.is-tbd {
-      border-style: dashed;
-      border-color: var(--purple);
-      background: #fcfaff;
-    }
+    .plan-item.is-malchul { border-color: var(--primary); background: #f8fbff; }
+    .plan-item.is-tbd { border-style: dashed; border-color: var(--purple); background: #fcfaff; }
 
     .plan-top {
       display: flex;
@@ -601,15 +623,14 @@
       margin-bottom: 6px;
     }
 
-    .plan-title {
-      font-size: 15px;
-      font-weight: 700;
-    }
+    .plan-title { font-size: 15px; font-weight: 700; }
 
     .badge-group {
       display: flex;
       gap: 4px;
       flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .badge {
@@ -628,6 +649,7 @@
     .badge-visit { background: var(--pink-light); color: var(--pink); }
     .badge-discharge { background: var(--danger-light); color: var(--danger); }
     .badge-tbd { background: var(--purple-light); color: var(--purple); }
+    .badge-notmo { background: #fff0f0; color: var(--danger); border: 1px solid #ffc9c9; }
 
     .plan-meta {
       font-size: 13px;
@@ -639,6 +661,13 @@
       font-size: 12px;
       color: var(--primary);
       font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .plan-cost-line {
+      font-size: 12px;
+      color: #d9480f;
+      font-weight: 700;
       margin-bottom: 6px;
     }
 
@@ -692,14 +721,8 @@
       flex-shrink: 0;
     }
 
-    .check-text {
-      font-size: 14px;
-    }
-
-    .check-text.done {
-      text-decoration: line-through;
-      color: var(--sub);
-    }
+    .check-text { font-size: 14px; }
+    .check-text.done { text-decoration: line-through; color: var(--sub); }
 
     /* Bottom Tabs */
     .tab-bar {
@@ -731,15 +754,8 @@
       flex: 1;
     }
 
-    .tab-btn.active {
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    .tab-icon {
-      font-size: 18px;
-    }
-
+    .tab-btn.active { color: var(--primary); font-weight: 700; }
+    .tab-icon { font-size: 18px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
@@ -850,11 +866,26 @@
           <div class="field" style="grid-column: span 2;">
             <label for="inJeonhyu">
               <span>전휴 (일) · 휴가 합계 미포함</span>
-              <span class="remain-tag neutral" id="remJeonhyu">별도 관리</span>
+              <span class="remain-tag neutral">별도 관리</span>
             </label>
             <input type="number" id="inJeonhyu" min="0" value="0" />
           </div>
         </div>
+      </div>
+
+      <!-- 달별 총 교통비 카드 -->
+      <div class="card">
+        <div class="card-title">
+          <span>달별 총 교통비 (TMO 미적용)</span>
+          <span class="card-sub" id="totalAllCostText">총 0원</span>
+        </div>
+        <div class="field">
+          <label for="inDefaultTransport">
+            <span>기본 왕복 교통비 (원) · 포상/위로/외박 자동 적용</span>
+          </label>
+          <input type="number" id="inDefaultTransport" min="0" step="1000" value="50000" />
+        </div>
+        <div id="monthlyCostList"></div>
       </div>
     </section>
 
@@ -880,6 +911,7 @@
           <span class="legend-item"><i class="legend-dot" style="background: var(--danger);"></i>전역·공휴일</span>
         </div>
 
+        <div id="calCostBanner" class="cal-cost-banner" style="display:none;"></div>
         <div id="calTbdBanner" class="cal-tbd-banner" style="display:none;"></div>
 
         <div class="cal-weekdays">
@@ -894,6 +926,15 @@
             <button class="btn btn-gray btn-sm" id="btnClearRange">선택 해제</button>
           </div>
           <div class="quick-picker-hint" id="quickRangeHint"></div>
+
+          <div class="quick-sub-label">휴가 종류 선택 (말출·중간휴가 등록 시 적용)</div>
+          <div class="quick-kind-row" id="quickKindRow">
+            <button class="kind-pill active" data-kind="annual">연가 (TMO)</button>
+            <button class="kind-pill" data-kind="reward">포상 (자비)</button>
+            <button class="kind-pill" data-kind="other">위로 (자비)</button>
+            <button class="kind-pill" data-kind="expected">예정</button>
+          </div>
+
           <input type="text" id="quickTitleInput" class="quick-title-input" placeholder="일정명 (비워두면 버튼 이름으로 등록)" />
           <div class="quick-type-grid" id="quickTypeButtons">
             <button class="quick-type-btn malchul" data-quick-type="말출">말출</button>
@@ -977,15 +1018,15 @@
           </div>
           <div class="grid-2">
             <div class="field">
-              <label for="bdAnnual">연가</label>
+              <label for="bdAnnual">연가 (TMO O)</label>
               <input type="number" id="bdAnnual" min="0" value="0" />
             </div>
             <div class="field">
-              <label for="bdReward">포상</label>
+              <label for="bdReward">포상 (TMO X)</label>
               <input type="number" id="bdReward" min="0" value="0" />
             </div>
             <div class="field">
-              <label for="bdOther">위로·보상</label>
+              <label for="bdOther">위로·보상 (TMO X)</label>
               <input type="number" id="bdOther" min="0" value="0" />
             </div>
             <div class="field">
@@ -993,6 +1034,15 @@
               <input type="number" id="bdExpected" min="0" value="0" />
             </div>
           </div>
+        </div>
+
+        <!-- 교통비 입력 영역 -->
+        <div class="field">
+          <label for="planTransportCost">
+            <span>왕복 교통비 (원) · TMO 적용 시 0원</span>
+            <button type="button" class="btn btn-gray btn-sm" id="btnAutoCost" style="padding: 2px 8px; font-size: 11px;">자동계산</button>
+          </label>
+          <input type="number" id="planTransportCost" min="0" step="1000" value="0" />
         </div>
 
         <div class="field">
@@ -1092,13 +1142,12 @@
   <script>
     const STORAGE_KEY = 'roka_leave_planner_v1';
 
-    // 휴가 합계에 포함되는 키 (전휴 제외)
     const LEAVE_KEYS = ['annual', 'reward', 'other', 'expected'];
     const LEAVE_LABELS = {
       annual: '연가',
       reward: '포상',
-      other: '위로·보상',
-      expected: '추가예정'
+      other: '위로',
+      expected: '예정'
     };
 
     const KR_HOLIDAYS = {
@@ -1149,6 +1198,7 @@
     const DEFAULT_STATE = {
       enlistDate: '2026-01-26',
       dischargeDate: '2027-07-25',
+      defaultTransportCost: 50000,
       leavePool: {
         annual: 15,
         reward: 10,
@@ -1166,6 +1216,7 @@
           end: '2026-12-20',
           noDeduct: true,
           deductBreakdown: { annual: 0, reward: 0, other: 0, expected: 0 },
+          transportCost: 50000,
           memo: '가족 모임 / 부대 인근 숙소'
         },
         {
@@ -1177,6 +1228,7 @@
           days: 4,
           noDeduct: false,
           deductBreakdown: { annual: 4, reward: 0, other: 0, expected: 0 },
+          transportCost: 0,
           memo: '3박 4일 비발디파크 예정 (날짜 추후 확정)'
         },
         {
@@ -1188,6 +1240,7 @@
           end: '2027-03-17',
           noDeduct: false,
           deductBreakdown: { annual: 5, reward: 2, other: 0, expected: 0 },
+          transportCost: 0,
           memo: '국외여행 허가 출국 1~2개월 전 신청 필수 / 김해공항 출국'
         }
       ],
@@ -1204,12 +1257,13 @@
 
     let state = loadState();
 
-    // Calendar UI State (Range Selection)
+    // Calendar UI State
     const nowInit = new Date();
     let calYear = nowInit.getFullYear();
     let calMonth = nowInit.getMonth();
     let rangeStart = null;
     let rangeEnd = null;
+    let selectedQuickKind = 'annual'; // 'annual' | 'reward' | 'other' | 'expected'
 
     function loadState() {
       try {
@@ -1219,6 +1273,7 @@
         return {
           ...structuredClone(DEFAULT_STATE),
           ...parsed,
+          defaultTransportCost: parsed.defaultTransportCost !== undefined ? Number(parsed.defaultTransportCost) : 50000,
           leavePool: { ...DEFAULT_STATE.leavePool, ...(parsed.leavePool || {}) }
         };
       } catch {
@@ -1245,6 +1300,10 @@
       document.querySelectorAll('.tab-panel').forEach(p => {
         p.classList.toggle('active', p.id === tabId);
       });
+    }
+
+    function formatWon(num) {
+      return `${Number(num || 0).toLocaleString('ko-KR')}원`;
     }
 
     // Date Helpers
@@ -1286,6 +1345,11 @@
       return calcInclusiveDays(p.start, p.end);
     }
 
+    function getPlanMonthKey(p) {
+      if (p.isTbd) return p.month || '';
+      return p.start ? p.start.slice(0, 7) : '';
+    }
+
     function getPlanBreakdown(p) {
       const empty = { annual: 0, reward: 0, other: 0, expected: 0 };
       if (p.noDeduct) return empty;
@@ -1303,11 +1367,47 @@
       return { ...empty, annual: getPlanDays(p) };
     }
 
+    function isNoTmoPlan(type, bd) {
+      if (type === '전투휴무' || type === '면회') return false;
+      if (type === '외박/외출') return true;
+      // 연가가 1일이라도 포함되면 TMO 적용, 포상/위로만 있으면 TMO 미적용
+      if (Number(bd.annual || 0) > 0) return false;
+      if (Number(bd.reward || 0) > 0 || Number(bd.other || 0) > 0) return true;
+      return false;
+    }
+
+    function getPlanTransportCost(p) {
+      if (p.transportCost !== undefined && p.transportCost !== null) {
+        return Math.max(0, Number(p.transportCost || 0));
+      }
+      const bd = getPlanBreakdown(p);
+      return isNoTmoPlan(p.type, bd) ? Number(state.defaultTransportCost || 0) : 0;
+    }
+
     function formatBreakdownText(p) {
       if (p.noDeduct) return '';
       const bd = getPlanBreakdown(p);
       const parts = LEAVE_KEYS.filter(k => bd[k] > 0).map(k => `${LEAVE_LABELS[k]} ${bd[k]}일`);
       return parts.length ? parts.join(' + ') : '';
+    }
+
+    // 달력 칸에 표시할 텍스트 (연가/포상/위로 등 종류 표시)
+    function getCalendarBarLabel(p) {
+      if (p.type === '외박/외출' || p.type === '전투휴무' || p.type === '면회') {
+        return p.title.length > 5 ? p.title.slice(0, 5) : p.title;
+      }
+      const bd = getPlanBreakdown(p);
+      const kinds = LEAVE_KEYS.filter(k => bd[k] > 0).map(k => LEAVE_LABELS[k]);
+      const kindShort = kinds.length === 1 ? kinds[0] : (kinds.length > 1 ? kinds.map(k => k[0]).join('+') : '');
+
+      if (p.type === '말출') {
+        return kindShort ? `말·${kindShort}` : '말출';
+      }
+      if (kindShort) {
+        if (p.title === '중간휴가' || p.title === kindShort) return kindShort;
+        return `${kindShort}·${p.title.slice(0, 3)}`;
+      }
+      return p.title.length > 5 ? p.title.slice(0, 5) : p.title;
     }
 
     function getPlanSortKey(p) {
@@ -1355,6 +1455,25 @@
       return { total, used, remain, usedByType, remainByType, futureOutDays };
     }
 
+    // Monthly Transport Cost Calculation
+    function getMonthlyCostSummary() {
+      const byMonth = {};
+      let totalCost = 0;
+
+      state.plans.forEach(p => {
+        const cost = getPlanTransportCost(p);
+        if (cost <= 0) return;
+        const mKey = getPlanMonthKey(p);
+        if (!mKey) return;
+        if (!byMonth[mKey]) byMonth[mKey] = { cost: 0, count: 0 };
+        byMonth[mKey].cost += cost;
+        byMonth[mKey].count += 1;
+        totalCost += cost;
+      });
+
+      return { byMonth, totalCost };
+    }
+
     // Render Hero
     function renderHero() {
       const today = new Date();
@@ -1389,6 +1508,7 @@
       document.getElementById('inOther').value = other;
       document.getElementById('inJeonhyu').value = jeonhyu;
       document.getElementById('inExpected').value = expected;
+      document.getElementById('inDefaultTransport').value = state.defaultTransportCost;
 
       const { total, used, remain, remainByType } = getLeaveSummary();
       document.getElementById('statTotal').textContent = `${total}일`;
@@ -1409,6 +1529,29 @@
         el.textContent = `잔여 ${val}일`;
         el.className = `remain-tag ${val < 0 ? 'negative' : ''}`;
       });
+
+      // Render Monthly Transport Cost List
+      const { byMonth, totalCost } = getMonthlyCostSummary();
+      document.getElementById('totalAllCostText').textContent = `누적 ${formatWon(totalCost)}`;
+      const costList = document.getElementById('monthlyCostList');
+      const months = Object.keys(byMonth).sort();
+      if (months.length === 0) {
+        costList.innerHTML = `<div class="empty-state" style="padding: 12px 0;">교통비가 발생하는 일정이 없습니다.</div>`;
+      } else {
+        costList.innerHTML = months.map(m => {
+          const [y, mm] = m.split('-');
+          const info = byMonth[m];
+          return `
+            <div class="cost-row">
+              <div>
+                <span class="cost-month">${y}년 ${Number(mm)}월</span>
+                <span class="cost-detail">${info.count}건</span>
+              </div>
+              <div class="cost-amount">${formatWon(info.cost)}</div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     // Render Calendar
@@ -1448,7 +1591,7 @@
         document.getElementById('quickRangeText').textContent =
           `${formatKoreanDate(rangeStart)} ~ ${formatKoreanDate(rangeEnd)} (${nights}박 ${days}일)`;
         document.getElementById('quickRangeHint').textContent =
-          '아래 버튼을 누르면 선택한 기간이 바로 등록됩니다.';
+          '휴가 종류를 고른 뒤 아래 버튼을 누르면 바로 등록됩니다.';
       } else {
         document.getElementById('quickRangeText').textContent =
           `${formatKoreanDate(rangeStart)} (1일)`;
@@ -1460,6 +1603,20 @@
     function renderCalendar() {
       document.getElementById('calMonthTitle').textContent = `${calYear}년 ${calMonth + 1}월`;
       const currentMonthKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
+
+      // 이번 달 총 교통비 배너
+      const { byMonth } = getMonthlyCostSummary();
+      const monthCostInfo = byMonth[currentMonthKey];
+      const costBanner = document.getElementById('calCostBanner');
+      if (monthCostInfo && monthCostInfo.cost > 0) {
+        costBanner.style.display = 'flex';
+        costBanner.innerHTML = `
+          <span>🚆 ${calMonth + 1}월 예상 교통비 (TMO 미적용 ${monthCostInfo.count}건)</span>
+          <strong>${formatWon(monthCostInfo.cost)}</strong>
+        `;
+      } else {
+        costBanner.style.display = 'none';
+      }
 
       const tbdBanner = document.getElementById('calTbdBanner');
       const monthTbdPlans = state.plans.filter(p => p.isTbd && p.month === currentMonthKey);
@@ -1504,8 +1661,7 @@
         }
         const maxBars = isDischarge ? 1 : 2;
         dayPlans.slice(0, maxBars).forEach(p => {
-          const shortTitle = p.title.length > 5 ? p.title.slice(0, 5) : p.title;
-          barsHtml += `<div class="cal-bar ${getPlanBarClass(p.type)}">${escapeHtml(shortTitle)}</div>`;
+          barsHtml += `<div class="cal-bar ${getPlanBarClass(p.type)}">${escapeHtml(getCalendarBarLabel(p))}</div>`;
         });
         if (dayPlans.length > maxBars) {
           barsHtml += `<div class="cal-bar" style="background:#8b95a1;">+${dayPlans.length - maxBars}</div>`;
@@ -1542,6 +1698,7 @@
       const badgeClass = getPlanBadgeClass(p.type);
       const deductText = p.noDeduct ? '일수 미차감' : `${days}일 차감`;
       const breakdownText = formatBreakdownText(p);
+      const cost = getPlanTransportCost(p);
 
       const dateText = p.isTbd
         ? `${formatKoreanMonth(p.month)} (날짜 미정) · <strong>${nights}박 ${days}일</strong> (${deductText})`
@@ -1552,12 +1709,14 @@
           <div class="plan-top">
             <div class="plan-title">${escapeHtml(p.title)}</div>
             <div class="badge-group">
+              ${cost > 0 ? `<span class="badge badge-notmo">TMO X</span>` : ''}
               ${p.isTbd ? `<span class="badge badge-tbd">날짜미정</span>` : ''}
               <span class="badge ${badgeClass}">${p.type}</span>
             </div>
           </div>
           <div class="plan-meta">${dateText}</div>
-          ${breakdownText ? `<div class="plan-breakdown-line">차감: ${breakdownText}</div>` : ''}
+          ${breakdownText ? `<div class="plan-breakdown-line">휴가 종류: ${breakdownText}</div>` : ''}
+          ${cost > 0 ? `<div class="plan-cost-line">🚆 왕복 교통비: ${formatWon(cost)}</div>` : ''}
           ${p.memo ? `<div class="plan-memo">${escapeHtml(p.memo)}</div>` : ''}
           ${showActions ? `
             <div class="plan-actions">
@@ -1709,6 +1868,13 @@
       };
     }
 
+    function autoFillFormTransportCost() {
+      const type = document.getElementById('planType').value;
+      const bd = getFormBreakdownValues();
+      const cost = isNoTmoPlan(type, bd) ? Number(state.defaultTransportCost || 0) : 0;
+      document.getElementById('planTransportCost').value = cost;
+    }
+
     function updateBreakdownStatus() {
       const targetDays = getFormTargetDays();
       const bd = getFormBreakdownValues();
@@ -1748,6 +1914,7 @@
         document.getElementById('bdExpected').value = bd.expected;
         updateBreakdownStatus();
 
+        document.getElementById('planTransportCost').value = getPlanTransportCost(p);
         document.getElementById('planMemo').value = p.memo || '';
         document.getElementById('formHeading').textContent = '일정 수정 중';
         document.getElementById('btnCancelEdit').style.display = 'inline-flex';
@@ -1821,6 +1988,16 @@
       renderCalendar();
     });
 
+    // Quick Kind Selection (연가 / 포상 / 위로 / 예정)
+    document.getElementById('quickKindRow').addEventListener('click', (e) => {
+      const btn = e.target.closest('.kind-pill[data-kind]');
+      if (!btn) return;
+      selectedQuickKind = btn.dataset.kind;
+      document.querySelectorAll('#quickKindRow .kind-pill').forEach(p => {
+        p.classList.toggle('active', p.dataset.kind === selectedQuickKind);
+      });
+    });
+
     // Quick 1-Tap Registration from Calendar
     document.getElementById('quickTypeButtons').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-quick-type]');
@@ -1834,6 +2011,13 @@
       const title = customTitle || type;
       const noDeduct = isAutoNoDeductType(type);
 
+      const bd = { annual: 0, reward: 0, other: 0, expected: 0 };
+      if (!noDeduct) {
+        bd[selectedQuickKind] = days;
+      }
+
+      const transportCost = isNoTmoPlan(type, bd) ? Number(state.defaultTransportCost || 0) : 0;
+
       state.plans.push({
         id: 'p_' + Date.now(),
         title,
@@ -1844,9 +2028,8 @@
         month: '',
         days: 0,
         noDeduct,
-        deductBreakdown: noDeduct
-          ? { annual: 0, reward: 0, other: 0, expected: 0 }
-          : { annual: days, reward: 0, other: 0, expected: 0 },
+        deductBreakdown: bd,
+        transportCost,
         memo: ''
       });
 
@@ -1855,7 +2038,9 @@
       document.getElementById('quickTitleInput').value = '';
       saveState();
       renderAll();
-      showToast(`'${title}' (${days}일) 등록 완료!`);
+      showToast(transportCost > 0
+        ? `'${title}' 등록 완료 (교통비 ${formatWon(transportCost)})`
+        : `'${title}' (${days}일) 등록 완료!`);
     });
 
     // Event Delegation: Calendar Details & Plan List Edit/Delete
@@ -1871,7 +2056,7 @@
       handlePlanAction(btn.dataset.action, btn.dataset.id);
     });
 
-    // Event Listeners: Leave Pool Inputs
+    // Event Listeners: Leave Pool & Default Transport Cost
     ['inAnnual', 'inReward', 'inOther', 'inJeonhyu', 'inExpected'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => {
         state.leavePool = {
@@ -1887,11 +2072,19 @@
       });
     });
 
+    document.getElementById('inDefaultTransport').addEventListener('input', (e) => {
+      state.defaultTransportCost = Math.max(0, Number(e.target.value || 0));
+      saveState();
+      renderDashboard();
+      renderCalendar();
+    });
+
     // Event Listeners: Plan Form
     document.getElementById('planType').addEventListener('change', (e) => {
       const noDeduct = isAutoNoDeductType(e.target.value);
       document.getElementById('planNoDeduct').checked = noDeduct;
       toggleBreakdownUI(noDeduct);
+      autoFillFormTransportCost();
     });
 
     document.getElementById('planIsTbd').addEventListener('change', (e) => {
@@ -1900,10 +2093,23 @@
 
     document.getElementById('planNoDeduct').addEventListener('change', (e) => {
       toggleBreakdownUI(e.target.checked);
+      autoFillFormTransportCost();
     });
 
-    ['planStart', 'planEnd', 'planTbdDays', 'bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
+    ['planStart', 'planEnd', 'planTbdDays'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateBreakdownStatus);
+    });
+
+    ['bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        updateBreakdownStatus();
+        autoFillFormTransportCost();
+      });
+    });
+
+    document.getElementById('btnAutoCost').addEventListener('click', () => {
+      autoFillFormTransportCost();
+      showToast('TMO 여부에 맞춰 교통비가 자동 계산되었습니다.');
     });
 
     function resetPlanForm() {
@@ -1921,6 +2127,7 @@
       ['bdAnnual', 'bdReward', 'bdOther', 'bdExpected'].forEach(id => {
         document.getElementById(id).value = '0';
       });
+      document.getElementById('planTransportCost').value = '0';
       updateBreakdownStatus();
       document.getElementById('planMemo').value = '';
       document.getElementById('formHeading').textContent = '새 휴가·외박 일정 추가';
@@ -1935,6 +2142,7 @@
       const type = document.getElementById('planType').value;
       const isTbd = document.getElementById('planIsTbd').checked;
       const noDeduct = document.getElementById('planNoDeduct').checked;
+      const transportCost = Math.max(0, Number(document.getElementById('planTransportCost').value || 0));
       const memo = document.getElementById('planMemo').value.trim();
 
       if (!title) {
@@ -1942,7 +2150,7 @@
         return;
       }
 
-      let planData = { title, type, isTbd, noDeduct, memo };
+      let planData = { title, type, isTbd, noDeduct, transportCost, memo };
       let totalPlanDays = 0;
 
       if (isTbd) {
